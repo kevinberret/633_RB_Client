@@ -22,10 +22,11 @@ public class ClientController {
 	public boolean selectFolder(String selectedFolder){
 		if(selectedFolder != null && !selectedFolder.isEmpty())
 			if(cm.selectFolder(selectedFolder))
-				if( cm.connectToServer()){
+				if(cm.connectToServer()){
 					ClientListener cl = new ClientListener(cm.getClientAsServerPort(), cm.getFolder());
 					Thread t1 = new Thread(cl);					
 					t1.start();
+					return true;
 				}
 		
 		return false;					
