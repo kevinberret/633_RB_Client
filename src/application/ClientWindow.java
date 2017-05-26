@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,6 +18,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class ClientWindow extends JFrame{
 	// GUI Elements
@@ -25,7 +28,13 @@ public class ClientWindow extends JFrame{
 	private JMenu jmFile;
 	private JMenuItem jmiShareFiles;
 	private JMenuItem jmiGetClients;
+	private JButton btnGetFiles;
 	private JList<String> jlClients;
+	private JList<String> jlFiles;
+	
+	private String client;
+	private ArrayList<String> clients;
+	private ArrayList<Object> clientsList;
 	
 	private ClientController controller;
 	
@@ -50,8 +59,14 @@ public class ClientWindow extends JFrame{
 		// Display client ip address
 		JLabel lblIPAddress = new JLabel(controller.getClientName());
 		
+		// Add button to get files from other client
+		btnGetFiles = new JButton("Get files");
+		btnGetFiles.addActionListener(new GetFiles());
+		btnGetFiles.setEnabled(false);
+		
 		// Add elements to the frame
 		add(lblIPAddress, BorderLayout.SOUTH);
+		add(btnGetFiles, BorderLayout.EAST);
 		
 		pack();
 	}
@@ -86,12 +101,20 @@ public class ClientWindow extends JFrame{
 		}		
 	}
 	
-	private class GetClientAction implements ActionListener{
-		private ArrayList<String> clients;
+	private class GetFiles implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			ArrayList<Object> clientsList = controller.getClientsList();
+			
+		}
+		
+	}
+	
+	private class GetClientAction implements ActionListener{		
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			clientsList = controller.getClientsList();
 			clients = new ArrayList<String>();
 			
 			// Create the list
@@ -110,10 +133,42 @@ public class ClientWindow extends JFrame{
 			jlClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			jlClients.setLayoutOrientation(JList.VERTICAL);
 			jlClients.setVisibleRowCount(-1);
+			jlClients.addListSelectionListener(new SelectClient());
 			JScrollPane listScroller = new JScrollPane(jlClients);
 			listScroller.setPreferredSize(new Dimension(250, 80));
 			
 			add(listScroller, BorderLayout.WEST);
 		}		
+	}
+	
+	class SelectClient implements ListSelectionListener {
+		private ArrayList<String> files = new ArrayList<String>();
+		
+	    public void valueChanged(ListSelectionEvent e) {
+	    	 if (!e.getValueIsAdjusting()){
+				JList source = (JList)e.getSource();
+				source.getSelectedValue().toString();
+				ArrayList<String> client = (ArrayList<String>)clientsList.get(source.getSelectedIndex());
+				
+				for (int i = 1; i < client.size(); i++) {
+					files.add(client.get(i));
+				}
+				
+				if(files != null){
+					jlFiles = new JList((ListModel) files);
+					btnGetFiles.setEnabled(true);
+				}
+				else
+					jlFiles = new JList();
+	 			
+				jlFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+				jlFiles.setLayoutOrientation(JList.VERTICAL);
+				jlFiles.setVisibleRowCount(-1);
+				JScrollPane listFilesScroller = new JScrollPane(jlFiles);
+				listFilesScroller.setPreferredSize(new Dimension(250, 80));
+				
+				add(listFilesScroller, BorderLayout.CENTER);
+	         }
+	    }
 	}
 }

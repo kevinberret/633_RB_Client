@@ -23,15 +23,33 @@ public class ClientModel {
 	private ArrayList<Object> clientsList;
 	private String folder;
 	
-	public String getClientName() {
-		return clientName;
-	}
-
 	public ClientModel() {
 		// Get application settings
 		getResources();
 	}
 	
+	/*
+	 * GETTERS
+	 */
+	public String getClientName() {
+		return clientName;
+	}
+	
+	public int getClientAsServerPort() {
+		return clientAsServerPort;
+	}
+
+	public ArrayList<Object> getClientsList() {
+		return clientsList;
+	}
+	
+	public String getFolder() {
+		return folder;
+	}
+
+	/*
+	 * APPLICATION CORE
+	 */	
 	private void getResources(){
 		ResourceBundle bundle = ResourceBundle.getBundle("application.properties.config");
 		serverName = bundle.getString("server.ip");
@@ -50,9 +68,7 @@ public class ClientModel {
 	    	return false;
 	}
 	
-	public String getFolder() {
-		return folder;
-	}
+	
 
 	public boolean connectToServer(){		
 		try {			
@@ -117,12 +133,5 @@ public class ClientModel {
 		
 		return null;
 	}
-
-	public int getClientAsServerPort() {
-		return clientAsServerPort;
-	}
-
-	public ArrayList<Object> getClientsList() {
-		return clientsList;
-	}
+	
 }
