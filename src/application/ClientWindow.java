@@ -1,16 +1,22 @@
 package application;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 
 public class ClientWindow extends JFrame{
 	// GUI Elements
@@ -18,6 +24,8 @@ public class ClientWindow extends JFrame{
 	private JMenuBar jmbMenuBar;
 	private JMenu jmFile;
 	private JMenuItem jmiShareFiles;
+	private JMenuItem jmiGetClients;
+	private JList<String> jlClients;
 	
 	private ClientController controller;
 	
@@ -32,7 +40,10 @@ public class ClientWindow extends JFrame{
 		jmFile = new JMenu("File");
 		jmiShareFiles = new JMenuItem("Share");
 		jmiShareFiles.addActionListener(new BrowseAction());
+		jmiGetClients = new JMenuItem("Get clients");
+		jmiGetClients.addActionListener(new GetClientAction());
 		jmFile.add(jmiShareFiles);
+		jmFile.add(jmiGetClients);
 		jmbMenuBar.add(jmFile);
 		setJMenuBar(jmbMenuBar);		
 		
@@ -73,5 +84,35 @@ public class ClientWindow extends JFrame{
 		    	}
 		    }
 		}		
+	}
+	
+	private class GetClientAction implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			ArrayList<Object> clientsList = controller.getClientsList();
+			ArrayList<String> clients = new ArrayList<String>();
+			
+			// Create the list
+			if(clientsList != null){
+				for(int i = 0 ; i < clientsList.size()  ; i++){
+					String client = ((ArrayList<String>)clientsList.get(i)).get(0);
+					if(!client.equals(controller.getClientName()))
+						clients.add(client);
+				}
+				
+				jlClients = new JList((ListModel) clients);
+			}
+			else
+				jlClients = new JList();
+			
+			jlClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			jlClients.setLayoutOrientation(JList.VERTICAL);
+			jlClients.setVisibleRowCount(-1);
+			JScrollPane listScroller = new JScrollPane(jlClients);
+			listScroller.setPreferredSize(new Dimension(250, 80));
+			
+			add(listScroller, BorderLayout.WEST);
+		}
+		
 	}
 }

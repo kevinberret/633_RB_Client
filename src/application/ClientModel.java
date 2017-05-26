@@ -2,6 +2,7 @@ package application;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -18,6 +19,7 @@ public class ClientModel {
 	private InetAddress serverAddress;
 	private Socket mySocket;
 	private ObjectOutputStream objectOutput;
+	private ArrayList<Object> clientsList;
 	
 	public String getClientName() {
 		return clientName;
@@ -76,7 +78,6 @@ public class ClientModel {
 			
 			// close connection with server
 			objectOutput.close();
-			mySocket.close();
 			
 			return true;
 		}catch (UnknownHostException e) {
@@ -86,5 +87,26 @@ public class ClientModel {
 		}
 
 		return false;
+	}
+	
+	public void getClientFiles(){
+		try {
+			// Tell the server we want to get the clients list and their files
+			objectOutput.writeObject(new String("getfiles"));			
+			
+			// Get the clients list and their files
+			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
+			clientsList = (ArrayList<Object>) objectInputStream.readObject();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public ArrayList<Object> getClientsList() {
+		return clientsList;
 	}
 }

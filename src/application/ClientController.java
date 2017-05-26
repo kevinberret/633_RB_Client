@@ -1,5 +1,7 @@
 package application;
 
+import java.util.ArrayList;
+
 public class ClientController {
 	private ClientModel cm;
 	
@@ -9,6 +11,10 @@ public class ClientController {
 
 	public String getClientName() {
 		return cm.getClientName();
+	}
+	
+	public ArrayList<Object> getClientsList(){
+		return cm.getClientsList();
 	}
 	
 	public boolean selectFolder(String selectedFolder){
