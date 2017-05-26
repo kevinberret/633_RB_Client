@@ -23,7 +23,9 @@ public class ClientReceiver implements Runnable {
 	
 	@Override
 	public void run(){
+		System.out.println("Client receiver started");
 		for (String file : files) {
+			System.out.println("File transfer started");
 			try{
 				byte [] mybytearray  = new byte [1024];
 				InputStream is = clientSocket.getInputStream();				

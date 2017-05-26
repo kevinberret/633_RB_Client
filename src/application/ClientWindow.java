@@ -104,7 +104,8 @@ public class ClientWindow extends JFrame{
 	private class GetFiles implements ActionListener{
 
 		@Override
-		public void actionPerformed(ActionEvent e) {			
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("get files button clicked");
 			controller.getFiles(client, jlFiles.getSelectedValuesList());
 		}
 		
