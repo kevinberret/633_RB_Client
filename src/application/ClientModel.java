@@ -3,7 +3,6 @@ package application;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -64,8 +63,14 @@ public class ClientModel {
 					data.add(file.getName());
 			}
 			
-			// Send arraylist of client's ip and files to server
+			// Instantiate objectoutputstream to send data
 			objectOutput = new ObjectOutputStream(mySocket.getOutputStream());
+			
+			// Tell the server we want to register
+			objectOutput.writeObject(new String("registration"));
+			objectOutput.flush();
+			
+			// Send arraylist of client's ip and files to server
 			objectOutput.writeObject(data);
 			objectOutput.flush();
 			
