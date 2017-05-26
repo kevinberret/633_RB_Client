@@ -3,6 +3,7 @@ package application;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClientController {
 	private ClientModel cm;
@@ -32,7 +33,7 @@ public class ClientController {
 		return false;					
 	}
 	
-	public void getFiles(String serverAddress, ArrayList<String> files){
+	public void getFiles(String serverAddress, List<String> files){
 		try {
 			Socket clientSocket = new Socket(serverAddress, cm.getClientAsServerPort());
 			ClientReceiver cr = new ClientReceiver(clientSocket, files);

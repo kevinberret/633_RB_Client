@@ -104,8 +104,8 @@ public class ClientWindow extends JFrame{
 	private class GetFiles implements ActionListener{
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			
+		public void actionPerformed(ActionEvent e) {			
+			controller.getFiles(client, jlFiles.getSelectedValuesList());
 		}
 		
 	}
@@ -121,7 +121,7 @@ public class ClientWindow extends JFrame{
 			if(clientsList != null){
 				for(int i = 0 ; i < clientsList.size()  ; i++){
 					String client = ((ArrayList<String>)clientsList.get(i)).get(0);
-					if(!client.equals(controller.getClientName()))
+					//if(!client.equals(controller.getClientName()))
 						clients.add(client);
 				}
 				

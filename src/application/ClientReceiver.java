@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClientReceiver implements Runnable {
 	private Socket clientSocket;
@@ -13,9 +14,9 @@ public class ClientReceiver implements Runnable {
 	private int current = 0;
 	private FileOutputStream fos = null;
 	private BufferedOutputStream bos = null;
-	private ArrayList<String> files;
+	private List<String> files;
 
-	public ClientReceiver(Socket clientSocket, ArrayList<String> files) {
+	public ClientReceiver(Socket clientSocket, List<String> files) {
 		this.clientSocket = clientSocket ;
 		this.files = files;
 	}
