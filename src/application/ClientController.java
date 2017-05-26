@@ -38,9 +38,7 @@ public class ClientController {
 			Thread t = new Thread(cr);
 			t.start();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
+		}		
 	}
 }
