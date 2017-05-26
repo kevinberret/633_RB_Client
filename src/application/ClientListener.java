@@ -24,6 +24,7 @@ public class ClientListener implements Runnable {
 				
 				Thread t = new Thread(cs);
 				t.start();
+				t.join();
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -37,8 +37,10 @@ public class ClientReceiver implements Runnable {
 
 				bos.write(mybytearray, 0 , bytesRead);
 				bos.flush();
+				// TODO check si close fout la merde
 				bos.close();
 				
+				//TODO: check boucle infinie
 				do {
 					bytesRead =
 							is.read(mybytearray, current, (mybytearray.length-current));
