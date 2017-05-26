@@ -40,6 +40,9 @@ public class ClientModel {
 	}
 
 	public ArrayList<Object> getClientsList() {
+		if (clientsList == null)
+			return getClientFiles();
+		
 		return clientsList;
 	}
 	
