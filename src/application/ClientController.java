@@ -6,11 +6,6 @@ public class ClientController {
 	public ClientController(ClientModel cm) {
 		this.cm = cm;
 	}
-	
-	public void control(){
-		if(cm.selectFolder("sss"))
-			cm.connectToServer();
-	}
 
 	public String getClientName() {
 		return cm.getClientName();
@@ -19,7 +14,10 @@ public class ClientController {
 	public boolean selectFolder(String selectedFolder){
 		if(selectedFolder != null && !selectedFolder.isEmpty())
 			if(cm.selectFolder(selectedFolder))
-				return cm.connectToServer();
+				if( cm.connectToServer()){
+					// TODO: start 2 threads (receive & send)
+					
+				}
 		
 		return false;					
 	}

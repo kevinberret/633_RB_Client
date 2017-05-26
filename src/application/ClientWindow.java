@@ -53,7 +53,6 @@ public class ClientWindow extends JFrame{
 	}
 
 	private class BrowseAction implements ActionListener{
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// Generate jfilechooser
@@ -73,8 +72,6 @@ public class ClientWindow extends JFrame{
 		    		System.out.println("connection ko");
 		    	}
 		    }
-		}
-		
-		
+		}		
 	}
 }
