@@ -100,9 +100,6 @@ public class ClientModel {
 			objectOutput.writeObject(data);
 			objectOutput.flush();
 			
-			// close connection with server
-			objectOutput.close();
-			
 			return true;
 		}catch (UnknownHostException e) {
 			e.printStackTrace();
