@@ -125,7 +125,7 @@ public class ClientWindow extends JFrame{
 						clients.add(client);
 				}
 				
-				jlClients = new JList((ListModel) clients);
+				jlClients = new JList(clients.toArray());
 			}
 			else
 				jlClients = new JList();
@@ -155,7 +155,7 @@ public class ClientWindow extends JFrame{
 				}
 				
 				if(files != null){
-					jlFiles = new JList((ListModel) files);
+					jlFiles = new JList(files.toArray());
 					btnGetFiles.setEnabled(true);
 				}
 				else
