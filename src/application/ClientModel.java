@@ -14,6 +14,7 @@ public class ClientModel {
 	private String serverName;
 	private String clientName;
 	private int serverPort;
+	private int clientAsServerPort;
 	private ArrayList<String> data;
 	private File[] files;
 	private InetAddress serverAddress;
@@ -34,7 +35,8 @@ public class ClientModel {
 		ResourceBundle bundle = ResourceBundle.getBundle("application.properties.config");
 		serverName = bundle.getString("server.ip");
 		serverPort = Integer.parseInt(bundle.getString("server.port"));
-		clientName = bundle.getString("client.ip");		
+		clientName = bundle.getString("client.ip");
+		clientAsServerPort = Integer.parseInt(bundle.getString("client.asserver.port"));
 	}
 	
 	public boolean selectFolder(String selectedFolder){		
@@ -89,7 +91,7 @@ public class ClientModel {
 		return false;
 	}
 	
-	public void getClientFiles(){
+	public ArrayList<Object> getClientFiles(){
 		try {
 			// Tell the server we want to get the clients list and their files
 			objectOutput.writeObject(new String("getfiles"));			
@@ -97,6 +99,7 @@ public class ClientModel {
 			// Get the clients list and their files
 			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
 			clientsList = (ArrayList<Object>) objectInputStream.readObject();
+			return clientsList;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,6 +107,12 @@ public class ClientModel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		return null;
+	}
+
+	public int getClientAsServerPort() {
+		return clientAsServerPort;
 	}
 
 	public ArrayList<Object> getClientsList() {

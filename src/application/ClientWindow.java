@@ -87,10 +87,12 @@ public class ClientWindow extends JFrame{
 	}
 	
 	private class GetClientAction implements ActionListener{
+		private ArrayList<String> clients;
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			ArrayList<Object> clientsList = controller.getClientsList();
-			ArrayList<String> clients = new ArrayList<String>();
+			clients = new ArrayList<String>();
 			
 			// Create the list
 			if(clientsList != null){
@@ -112,7 +114,6 @@ public class ClientWindow extends JFrame{
 			listScroller.setPreferredSize(new Dimension(250, 80));
 			
 			add(listScroller, BorderLayout.WEST);
-		}
-		
+		}		
 	}
 }
