@@ -21,6 +21,7 @@ public class ClientModel {
 	private Socket mySocket;
 	private ObjectOutputStream objectOutput;
 	private ArrayList<Object> clientsList;
+	private String folder;
 	
 	public String getClientName() {
 		return clientName;
@@ -39,7 +40,8 @@ public class ClientModel {
 		clientAsServerPort = Integer.parseInt(bundle.getString("client.asserver.port"));
 	}
 	
-	public boolean selectFolder(String selectedFolder){		
+	public boolean selectFolder(String selectedFolder){
+		folder = selectedFolder;
 	    	files = new File(selectedFolder).listFiles();
 	    	
 	    	if(files.length > 0)
@@ -48,6 +50,10 @@ public class ClientModel {
 	    	return false;
 	}
 	
+	public String getFolder() {
+		return folder;
+	}
+
 	public boolean connectToServer(){		
 		try {			
 			serverAddress = InetAddress.getByName(serverName);
@@ -94,7 +100,8 @@ public class ClientModel {
 	public ArrayList<Object> getClientFiles(){
 		try {
 			// Tell the server we want to get the clients list and their files
-			objectOutput.writeObject(new String("getfiles"));			
+			objectOutput.writeObject(new String("getfiles"));
+			objectOutput.flush();
 			
 			// Get the clients list and their files
 			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());

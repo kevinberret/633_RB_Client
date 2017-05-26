@@ -21,7 +21,7 @@ public class ClientController {
 		if(selectedFolder != null && !selectedFolder.isEmpty())
 			if(cm.selectFolder(selectedFolder))
 				if( cm.connectToServer()){
-					ClientListener cl = new ClientListener(cm.getClientAsServerPort());
+					ClientListener cl = new ClientListener(cm.getClientAsServerPort(), cm.getFolder());
 					Thread t1 = new Thread(cl);					
 					t1.start();
 				}
