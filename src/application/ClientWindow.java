@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -15,6 +16,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
@@ -30,6 +32,7 @@ public class ClientWindow extends JFrame{
 	private JMenuItem jmiGetClients;
 	private JButton btnGetFiles;
 	private JList<String> jlClients;
+	private JScrollPane listClientsScroller;
 	private JList<String> jlFiles;
 	
 	private String client;
@@ -41,6 +44,9 @@ public class ClientWindow extends JFrame{
 	private void generateGUI(){
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
+		// Set desired size
+		setPreferredSize(new Dimension(1024,768));
+		
 		// Set the frame title
 		setTitle("Client p2p");
 		
@@ -51,6 +57,7 @@ public class ClientWindow extends JFrame{
 		jmiShareFiles.addActionListener(new BrowseAction());
 		jmiGetClients = new JMenuItem("Get clients");
 		jmiGetClients.addActionListener(new GetClientAction());
+		jmiGetClients.setEnabled(false);
 		jmFile.add(jmiShareFiles);
 		jmFile.add(jmiGetClients);
 		jmbMenuBar.add(jmFile);
@@ -77,6 +84,10 @@ public class ClientWindow extends JFrame{
 		// Generate the gui
 		generateGUI();				
 	}
+	
+	private void showErrorDialog(String title, String error, int type){
+		JOptionPane.showMessageDialog(this, error, title, type);
+	}
 
 	private class BrowseAction implements ActionListener{
 		@Override
@@ -93,10 +104,9 @@ public class ClientWindow extends JFrame{
 		    if (jfcChoose.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 		    	selectedFolder = jfcChoose.getSelectedFile().toString();
 		    	if(controller.selectFolder(selectedFolder))
-		    		System.out.println("connection ok");
-		    	else{
-		    		System.out.println("connection ko");
-		    	}
+		    		jmiGetClients.setEnabled(true);
+		    	else
+		    		showErrorDialog("Error", "Error while connecting to the server...", JOptionPane.ERROR_MESSAGE);		    	
 		    }
 		}		
 	}
@@ -106,15 +116,16 @@ public class ClientWindow extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("get files button clicked");
-			controller.getFiles(client, jlFiles.getSelectedValuesList());
+			if(!controller.getFiles(client, jlFiles.getSelectedValuesList()))
+				showErrorDialog("Error", "Error while connecting to the server...", JOptionPane.ERROR_MESSAGE);
 		}
 		
 	}
 	
-	private class GetClientAction implements ActionListener{		
+	private class GetClientAction implements ActionListener{	
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e) {			
 			clientsList = controller.getClientsList();
 			clients = new ArrayList<String>();
 			
@@ -135,10 +146,12 @@ public class ClientWindow extends JFrame{
 			jlClients.setLayoutOrientation(JList.VERTICAL);
 			jlClients.setVisibleRowCount(-1);
 			jlClients.addListSelectionListener(new SelectClient());
-			JScrollPane listScroller = new JScrollPane(jlClients);
-			listScroller.setPreferredSize(new Dimension(250, 80));
+			listClientsScroller = new JScrollPane(jlClients);
+			listClientsScroller.setPreferredSize(new Dimension(250, 80));
 			
-			add(listScroller, BorderLayout.WEST);
+			add(listClientsScroller, BorderLayout.WEST);
+			
+			revalidate();
 		}		
 	}
 	
@@ -169,6 +182,8 @@ public class ClientWindow extends JFrame{
 				listFilesScroller.setPreferredSize(new Dimension(250, 80));
 				
 				add(listFilesScroller, BorderLayout.CENTER);
+				
+				revalidate();
 	         }
 	    }
 	}

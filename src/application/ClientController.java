@@ -24,33 +24,26 @@ public class ClientController {
 		if(selectedFolder != null && !selectedFolder.isEmpty())
 			if(cm.selectFolder(selectedFolder))
 				if(cm.connectToServer()){					
-					try {
-						ClientListener cl = new ClientListener(cm.getClientAsServerPort(), cm.getFolder());
-						Thread t = new Thread(cl);
-						t.start();
-						t.join();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					ClientListener cl = new ClientListener(cm.getClientAsServerPort(), cm.getFolder());
+					Thread t = new Thread(cl);
+					t.start();
 					return true;
 				}
 		
 		return false;					
 	}
 	
-	public void getFiles(String serverAddress, List<String> files){
+	public boolean getFiles(String serverAddress, List<String> files){
 		try {
 			Socket clientSocket = new Socket(serverAddress, cm.getClientAsServerPort());
 			ClientReceiver cr = new ClientReceiver(clientSocket, files);
 			Thread t = new Thread(cr);
 			t.start();
-			t.join();
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+		}
+		
+		return false;
 	}
 }

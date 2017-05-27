@@ -1,6 +1,7 @@
 package application;
 
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +25,40 @@ public class ClientReceiver implements Runnable {
 	@Override
 	public void run(){
 		System.out.println("Client receiver started");
+		
+		// source https://coderanch.com/t/473799/java/Transfer-multiple-files-Server-Client 
+		DataInputStream dis;
+		int size;
+		byte[] nameInBytes;
+		String name;
+		byte[] contents;
+		
+		try {
+			for (String file : files) {
+				System.out.println("File " + file + " transfer started");
+				dis = new DataInputStream(clientSocket.getInputStream());
+				size = dis.readInt();
+				nameInBytes = new byte[size];
+				dis.readFully(nameInBytes);
+				name = new String(nameInBytes, "UTF-8");
+				size = dis.readInt();
+				contents  = new byte[size];
+				dis.readFully(contents);
+				bos = new BufferedOutputStream(fos);
+				bos.write(contents);
+				bos.flush();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+		
+		
 		for (String file : files) {
 			System.out.println("File transfer started");
+			
+			
+			/*
 			try{
 				byte [] mybytearray  = new byte [1024];
 				InputStream is = clientSocket.getInputStream();				
@@ -52,7 +85,7 @@ public class ClientReceiver implements Runnable {
 						+ " downloaded (" + current + " bytes read)");
 			}catch (IOException e) {
 				// TODO: handle exception
-			}
+			}*/
 		}
 		
 	}

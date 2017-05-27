@@ -1,12 +1,16 @@
 package application;
 
 import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class ClientSender implements Runnable {
@@ -22,7 +26,40 @@ public class ClientSender implements Runnable {
 	}
 	@Override
 	public void run() {
+		System.out.println("Client sender started");
+		
+		// source : https://coderanch.com/t/473799/java/Transfer-multiple-files-Server-Client
+		DataOutputStream dos;
+		byte[] nameInBytes;
+		byte[] fileInBytes;
+		File fileToSend;		
+		
 		try {
+			ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
+			ArrayList<String> filesList = (ArrayList<String>) objectInputStream.readObject();	
+			
+			for (String file : filesList) {
+				fileToSend = new File (folder + file);
+				fileInBytes = Files.readAllBytes(Paths.get(folder+file));
+				
+				dos = new DataOutputStream(clientSocket.getOutputStream());
+				nameInBytes = file.getBytes("UTF-8");
+				dos.writeInt(nameInBytes.length);
+				dos.write(nameInBytes);
+				dos.writeInt((int) fileToSend.length());
+				dos.write(fileInBytes);
+				dos.flush();
+				System.out.println("file sent");
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+		/*try {
 			ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
 			ArrayList<String> filesList = (ArrayList<String>) objectInputStream.readObject();
 			
@@ -60,6 +97,6 @@ public class ClientSender implements Runnable {
 		} catch (ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
+		}*/
 	}
 }

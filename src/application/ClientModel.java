@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+
+import javax.swing.JOptionPane;
 
 public class ClientModel {
 	private String serverName;
@@ -22,6 +25,7 @@ public class ClientModel {
 	private ObjectOutputStream objectOutput;
 	private ArrayList<Object> clientsList;
 	private String folder;
+	private int clientTimeOut;
 	
 	public ClientModel() {
 		// Get application settings
@@ -59,6 +63,7 @@ public class ClientModel {
 		serverPort = Integer.parseInt(bundle.getString("server.port"));
 		clientName = bundle.getString("client.ip");
 		clientAsServerPort = Integer.parseInt(bundle.getString("client.asserver.port"));
+		clientTimeOut = Integer.parseInt(bundle.getString("client.timeout"));
 	}
 	
 	public boolean selectFolder(String selectedFolder){
@@ -78,7 +83,8 @@ public class ClientModel {
 			serverAddress = InetAddress.getByName(serverName);
 
 			// Try to connect to the server
-			mySocket = new Socket(serverAddress, serverPort);		
+			mySocket = new Socket();
+			mySocket.connect(new InetSocketAddress(serverAddress, serverPort), clientTimeOut);
 			
 			// Creation of the arraylist of string that contains client's ip address and files list
 			data = new ArrayList<String>();
