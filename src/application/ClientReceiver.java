@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +19,11 @@ public class ClientReceiver implements Runnable {
 	private int current = 0;
 	private FileOutputStream fos = null;
 	private BufferedOutputStream bos = null;
-	private List<String> files;
+	private List<String> filesToReceive;
 
 	public ClientReceiver(Socket clientSocket, List<String> files) {
 		this.clientSocket = clientSocket ;
-		this.files = files;
+		this.filesToReceive = files;		
 	}
 	
 	@Override
@@ -39,6 +40,12 @@ public class ClientReceiver implements Runnable {
 		BufferedOutputStream bos;
 		
 		try {
+			// Instantiate objectoutputstream to send data
+			ObjectOutputStream objectOutput = new ObjectOutputStream(clientSocket.getOutputStream());
+			
+			// Tell the server which file we want
+			objectOutput.writeObject(filesToReceive);
+			
 			bis = new BufferedInputStream(clientSocket.getInputStream());
 			
 			dis = new DataInputStream(bis);

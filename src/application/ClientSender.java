@@ -54,7 +54,7 @@ public class ClientSender implements Runnable {
 			for(String file : filesList)
 			{
 				// Create the file to get all necessary informations
-				fileToSend = new File(folder+file);
+				fileToSend = new File(folder+"\\"+file);
 				
 				// Send file length and name
 			    long length = fileToSend.length();
