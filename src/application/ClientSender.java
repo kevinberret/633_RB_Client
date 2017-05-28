@@ -64,7 +64,7 @@ public class ClientSender implements Runnable {
 			    dos.writeUTF(name);
 
 			    // Create necessary objects to send the file
-			    fis = new FileInputStream(file);
+			    fis = new FileInputStream(folder+"\\"+file);
 			    bis = new BufferedInputStream(fis);
 
 			    // Send the file
