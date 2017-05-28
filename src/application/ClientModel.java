@@ -6,9 +6,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
@@ -26,10 +30,14 @@ public class ClientModel {
 	private ArrayList<Object> clientsList;
 	private String folder;
 	private int clientTimeOut;
+	private ArrayList<String> networks;
 	
 	public ClientModel() {
 		// Get application settings
 		getResources();
+		
+		// Get all network interfaces
+		getNetworkInterfaces();
 	}
 	
 	/*
@@ -53,6 +61,14 @@ public class ClientModel {
 	public String getFolder() {
 		return folder;
 	}
+	
+	/*
+	 * SETTERS
+	 */
+	
+	public void setClientName(String ip) {
+		clientName = ip;
+	}
 
 	/*
 	 * APPLICATION CORE
@@ -61,19 +77,42 @@ public class ClientModel {
 		ResourceBundle bundle = ResourceBundle.getBundle("application.properties.config");
 		serverName = bundle.getString("server.ip");
 		serverPort = Integer.parseInt(bundle.getString("server.port"));
-		clientName = bundle.getString("client.ip");
 		clientAsServerPort = Integer.parseInt(bundle.getString("client.asserver.port"));
 		clientTimeOut = Integer.parseInt(bundle.getString("client.timeout"));
 	}
 	
+	public ArrayList<String> getNetworkInterfaces(){
+		// source : https://docs.oracle.com/javase/tutorial/networking/nifs/listing.html
+		if(networks == null){
+			networks = new ArrayList<String>();
+			
+			try {
+				Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();			
+				for (NetworkInterface netint : Collections.list(nets)){
+		        	Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();	        	
+		            for (InetAddress inetAddress : Collections.list(inetAddresses)) {
+		            	if (!inetAddress.isLoopbackAddress() && inetAddress.isSiteLocalAddress()) {
+		    	        	networks.add(inetAddress.getHostAddress());
+		            	}
+		            }
+		        }
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return networks;
+	}
+	
 	public boolean selectFolder(String selectedFolder){
 		folder = selectedFolder;
-	    	files = new File(selectedFolder).listFiles();
-	    	
-	    	if(files.length > 0)
-	    		return true;
-	    	
-	    	return false;
+    	files = new File(selectedFolder).listFiles();
+    	
+    	if(files.length > 0)
+    		return true;
+    	
+    	return false;
 	}
 	
 	
@@ -138,6 +177,5 @@ public class ClientModel {
 		}
 		
 		return null;
-	}
-	
+	}	
 }

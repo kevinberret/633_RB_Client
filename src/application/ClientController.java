@@ -1,6 +1,7 @@
 package application;
 
 import java.io.IOException;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,14 @@ public class ClientController {
 	
 	public ArrayList<Object> getClientsList(){
 		return cm.getClientsList();
+	}
+	
+	public ArrayList<String> getNetworkInterfaces(){
+		return cm.getNetworkInterfaces();
+	}
+	
+	public void setClientIp(String ip){
+		cm.setClientName(ip);
 	}
 	
 	public boolean selectFolder(String selectedFolder){
