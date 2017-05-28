@@ -39,7 +39,7 @@ public class ClientWindow extends JFrame{
 	private JScrollPane listClientsScroller;
 	private JList<String> jlFiles;
 	
-	private String client;
+	private String clientAsServerIP;
 	private ArrayList<String> clients;
 	private ArrayList<Object> clientsList;
 	
@@ -148,7 +148,7 @@ public class ClientWindow extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			System.out.println("get files button clicked");
-			if(!controller.getFiles(client, jlFiles.getSelectedValuesList()))
+			if(!controller.getFiles(clientAsServerIP, jlFiles.getSelectedValuesList()))
 				showErrorDialog("Error", "Error while connecting to the server...", JOptionPane.ERROR_MESSAGE);
 		}
 		
@@ -202,6 +202,7 @@ public class ClientWindow extends JFrame{
 	    		// Get the jlist from which the command came
 				JList source = (JList)e.getSource();
 				ArrayList<String> client = (ArrayList<String>)clientsList.get(source.getSelectedIndex());
+				clientAsServerIP = source.getSelectedValue().toString();
 				
 				DefaultListModel<String> model;
 				
