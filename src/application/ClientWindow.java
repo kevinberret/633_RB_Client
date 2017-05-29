@@ -1,6 +1,7 @@
 package application;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +25,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -32,8 +35,10 @@ public class ClientWindow extends JFrame{
 	private JFileChooser jfcChoose;
 	private JMenuBar jmbMenuBar;
 	private JMenu jmFile;
+	private JMenu jmEdit;
 	private JMenuItem jmiShareFiles;
 	private JMenuItem jmiGetClients;
+	private JMenuItem jmiSettings;
 	private JButton btnGetFiles;
 	private JList<String> jlClients;
 	private JScrollPane listClientsScroller;
@@ -48,7 +53,25 @@ public class ClientWindow extends JFrame{
 	private JButton btnValidate;
 	
 	private void generateGUI(){
+		// Stops the program when frame is closed		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		// Get system presentation
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// Set desired size
 		setPreferredSize(new Dimension(1024,768));
@@ -67,7 +90,12 @@ public class ClientWindow extends JFrame{
 		jmiGetClients.setEnabled(false);
 		jmFile.add(jmiShareFiles);
 		jmFile.add(jmiGetClients);
+		jmEdit = new JMenu("Edit");
+		jmiSettings = new JMenuItem("Settings");
+		jmiSettings.addActionListener(new SettingsAction(this));
+		jmEdit.add(jmiSettings);		
 		jmbMenuBar.add(jmFile);
+		jmbMenuBar.add(jmEdit);
 		setJMenuBar(jmbMenuBar);		
 		
 		// Display client ip address
@@ -104,8 +132,22 @@ public class ClientWindow extends JFrame{
 		generateGUI();				
 	}
 	
-	private void showErrorDialog(String title, String error, int type){
+	public void showErrorDialog(String title, String error, int type){
 		JOptionPane.showMessageDialog(this, error, title, type);
+	}
+	
+	private class SettingsAction implements ActionListener{
+		private JFrame frame;
+		
+		public SettingsAction(JFrame frame) {
+			this.frame = frame;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Dialog modal = new ClientSettings(frame, "Settings", true, controller);
+			modal.setVisible(true);
+		}		
 	}
 	
 	private class ChooseIPAction implements ActionListener{
