@@ -44,7 +44,7 @@ public class ClientWindow extends JFrame{
 	private JComboBox<String> jcbNetworkInterfaces;
 	private JButton btnValidate;
 	private JProgressBar jpbOverallProgress;
-	private JProgressBar jpbCurrentProgress;
+	private ClientProgressBar jpbCurrentProgress;
 	
 	// Application Elements
 	private String clientAsServerIP;
@@ -115,7 +115,7 @@ public class ClientWindow extends JFrame{
 		}
 		
 		// Create progress bars
-		jpbCurrentProgress = new JProgressBar(0, 100);
+		jpbCurrentProgress = new ClientProgressBar();
 		JPanel pnlProgressBars = new JPanel();
 		JPanel pnlCurrent = new JPanel();
 		JLabel lblCurrentProgress = new JLabel("Current file");

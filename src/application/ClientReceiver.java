@@ -9,14 +9,16 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
+import java.util.Observable;
 
-public class ClientReceiver implements Runnable {
+public class ClientReceiver  extends Observable implements Runnable{
 	private Socket clientSocket;
 	private int bytesRead;
 	private int current = 0;
 	private FileOutputStream fos = null;
 	private BufferedOutputStream bos = null;
 	private List<String> filesToReceive;
+	private int currentProgress;
 
 	public ClientReceiver(Socket clientSocket, List<String> files) {
 		this.clientSocket = clientSocket ;
@@ -58,14 +60,19 @@ public class ClientReceiver implements Runnable {
 			{
 			    fileLength = dis.readLong();
 			    fileName = dis.readUTF();
-
+			    currentProgress = 0;
+			    
 			    files[i] = new File(fileName);
 
 			    fos = new FileOutputStream(files[i]);
 			    bos = new BufferedOutputStream(fos);
 
-			    for(int j = 0; j < fileLength; j++) 
+			    for(int j = 0; j < fileLength; j++){ 
 			    	bos.write(bis.read());
+			    	currentProgress = (int) ((j * 100) / fileLength);
+			    	setChanged();
+					notifyObservers();
+			    }
 
 			    bos.close();
 			}
@@ -139,6 +146,10 @@ public class ClientReceiver implements Runnable {
 			}
 		}*/
 		
+	}
+
+	public int getCurrentProgress() {
+		return currentProgress;
 	}
 
 }
