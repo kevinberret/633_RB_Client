@@ -96,7 +96,7 @@ public class ClientController {
 	public boolean getFiles(String serverAddress, List<String> files){
 		try {
 			Socket clientSocket = new Socket(serverAddress, cm.getClientAsServerPort());
-			clientReceiver = new ClientReceiver(clientSocket, files);
+			clientReceiver = new ClientReceiver(clientSocket, files, cm);
 			Thread threadReceiver = new Thread(clientReceiver);
 			threadReceiver.start();
 			return true;

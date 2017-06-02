@@ -18,11 +18,12 @@ public class ClientReceiver  extends Observable implements Runnable{
 	private FileOutputStream fos = null;
 	private BufferedOutputStream bos = null;
 	private List<String> filesToReceive;
-	private int currentProgress;
+	private ClientModel model;
 
-	public ClientReceiver(Socket clientSocket, List<String> files) {
-		this.clientSocket = clientSocket ;
-		this.filesToReceive = files;		
+	public ClientReceiver(Socket clientSocket, List<String> files, ClientModel model) {
+		this.clientSocket = clientSocket;
+		this.filesToReceive = files;
+		this.model = model;
 	}
 	
 	public Socket getClientSocket() {
@@ -60,7 +61,7 @@ public class ClientReceiver  extends Observable implements Runnable{
 			{
 			    fileLength = dis.readLong();
 			    fileName = dis.readUTF();
-			    currentProgress = 0;
+			    model.setCurrentProgress(0);
 			    
 			    files[i] = new File(fileName);
 
@@ -69,9 +70,7 @@ public class ClientReceiver  extends Observable implements Runnable{
 
 			    for(int j = 0; j < fileLength; j++){ 
 			    	bos.write(bis.read());
-			    	currentProgress = (int) ((j * 100) / fileLength);
-			    	setChanged();
-					notifyObservers();
+			    	model.setCurrentProgress((int) ((j * 100) / fileLength));
 			    }
 
 			    bos.close();
@@ -148,8 +147,5 @@ public class ClientReceiver  extends Observable implements Runnable{
 		
 	}
 
-	public int getCurrentProgress() {
-		return currentProgress;
-	}
 
 }

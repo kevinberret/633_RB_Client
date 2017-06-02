@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.io.File;
 import java.util.ArrayList;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -52,6 +53,7 @@ public class ClientWindow extends JFrame{
 	private ArrayList<Object> clientsList;	
 	private ClientController controller;
 	private JPanel pnlBottom;
+	private ClientModel model;
 		
 	private void generateGUI(){
 		// Stops the program when frame is closed		
@@ -115,7 +117,7 @@ public class ClientWindow extends JFrame{
 		}
 		
 		// Create progress bars
-		jpbCurrentProgress = new ClientProgressBar();
+		jpbCurrentProgress = new ClientProgressBar(model);
 		JPanel pnlProgressBars = new JPanel();
 		JPanel pnlCurrent = new JPanel();
 		JLabel lblCurrentProgress = new JLabel("Current file");
@@ -127,7 +129,7 @@ public class ClientWindow extends JFrame{
 		pnlOverall.add(lblOverall, BorderLayout.WEST);
 		pnlOverall.add(jpbOverallProgress, BorderLayout.CENTER);	
 		pnlProgressBars.add(pnlCurrent, BorderLayout.NORTH);
-		pnlProgressBars.add(pnlOverall, BorderLayout.SOUTH);
+		pnlProgressBars.add(pnlOverall, BorderLayout.SOUTH);		
 		
 		// Add button to get files from other client
 		btnGetFiles = new JButton("Get files");
@@ -149,8 +151,9 @@ public class ClientWindow extends JFrame{
 		pack();
 	}	
 	
-	public ClientWindow(ClientController controller) {		
+	public ClientWindow(ClientController controller, ClientModel model) {		
 		this.controller = controller;
+		this.model = model;
 		
 		// Generate the gui
 		generateGUI();

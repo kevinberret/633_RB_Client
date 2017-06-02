@@ -16,9 +16,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Observable;
 import java.util.Properties;
 
-public class ClientModel {
+public class ClientModel extends Observable{
 	private String serverName;
 	private String clientName;
 	private int serverPort;
@@ -33,6 +34,8 @@ public class ClientModel {
 	private int clientTimeOut;
 	private ArrayList<String> networks;
 	private Properties props;
+	
+	private int currentProgress;
 	
 	public ClientModel() {
 		// Get application settings
@@ -259,5 +262,19 @@ public class ClientModel {
 		}
 		
 		return null;
-	}	
+	}
+	
+	/*
+	 * Observable methods
+	 */
+	public int getCurrentProgress() {
+		return currentProgress;
+	}
+	
+	public void setCurrentProgress(int currentProgress){
+		this.currentProgress = currentProgress;
+		setChanged();
+		notifyObservers();
+	}
+	
 }
