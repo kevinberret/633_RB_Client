@@ -59,7 +59,7 @@ public class ClientWindow extends JFrame{
 	private ClientModel model;
 		
 	private void generateGUI(){
-		// Stops the program when frame is closed		
+		// Don't stop the program when frame is closed		
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
 		// Get system presentation
