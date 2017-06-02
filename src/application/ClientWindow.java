@@ -167,7 +167,8 @@ public class ClientWindow extends JFrame{
 	            cc.closeConnections();
 	        	
 	            // quit the application
-	        	dispose();	           
+	            // TODO: check if dispose is better to close running threads than this line
+	            setDefaultCloseOperation(EXIT_ON_CLOSE);
 	        }
 	    }
 	}
