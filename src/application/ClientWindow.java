@@ -51,7 +51,7 @@ public class ClientWindow extends JFrame{
 	
 	private void generateGUI(){
 		// Stops the program when frame is closed		
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
 		// Get system presentation
 		try {
@@ -163,7 +163,7 @@ public class ClientWindow extends JFrame{
 		@Override
 	    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 	        if (JOptionPane.showConfirmDialog(frame, "Are you sure you want to close this window?", "Close the window", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-	        	// close the socket
+	        	// close the sockets
 	            cc.closeConnections();
 	        	
 	            // quit the application
