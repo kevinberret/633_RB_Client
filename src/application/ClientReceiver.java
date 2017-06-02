@@ -73,6 +73,7 @@ public class ClientReceiver  extends Observable implements Runnable{
 			    	model.setCurrentProgress((int) ((j * 100) / fileLength));
 			    }
 
+			    model.setCurrentProgress(100);
 			    bos.close();
 			}
 
