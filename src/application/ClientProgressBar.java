@@ -6,15 +6,13 @@ import java.util.Observer;
 import javax.swing.JProgressBar;
 
 public class ClientProgressBar extends JProgressBar implements Observer{
-	private int min = 0;
-	private int max = 100;
 	private ClientModel model;
 	
 	public ClientProgressBar(ClientModel model) {
 		this.model = model;
-		
-		setMinimum(min);
-		setMaximum(max);
+
+		setMinimum(0);
+		setMaximum(100);
 		
 		this.model.addObserver(this);
 	}

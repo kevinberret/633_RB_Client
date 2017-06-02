@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author kb
@@ -35,8 +36,8 @@ public class ClientSettings extends Dialog {
 		this.cc = cc;
 		this.frame = (ClientWindow) frame;
 		
-		
 		JPanel pnlCenter = new JPanel();
+		pnlCenter.setBorder(new EmptyBorder(10, 10, 10, 10));
 		JLabel lblServerName = new JLabel("Server IP");
 		JLabel lblServerPort = new JLabel("Server port");
 		JLabel lblClientTimeOut = new JLabel("Time out");
@@ -45,8 +46,13 @@ public class ClientSettings extends Dialog {
 		jtfServerPort = new JTextField(cc.getServerPort());
 		jtfClientTimeOut = new JTextField(cc.getClientTimeOut());
 		jtfClientAsServerPort = new JTextField(cc.getClientAsServerPort());
+		
+		JPanel pnlBottom = new JPanel();
+		pnlBottom.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
 		JButton btnSave = new JButton("Save");
-		btnSave.addActionListener(new SaveAction());
+		btnSave.addActionListener(new SaveAction());		
+		pnlBottom.add(btnSave);
 		
 		pnlCenter.setLayout(new GridLayout(4, 2));
 		pnlCenter.add(lblServerName);
@@ -59,7 +65,7 @@ public class ClientSettings extends Dialog {
 		pnlCenter.add(jtfClientAsServerPort);
 		
 		add(pnlCenter, BorderLayout.CENTER);
-		add(btnSave, BorderLayout.SOUTH);
+		add(pnlBottom, BorderLayout.SOUTH);
 		
 		addWindowListener(new CloseAction());
 		

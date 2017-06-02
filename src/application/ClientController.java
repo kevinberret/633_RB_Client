@@ -110,13 +110,13 @@ public class ClientController {
 	public void closeConnections() {
 		try {
 			// close connection with clients
-			if(clientReceiver != null)
+			if(clientReceiver != null && clientReceiver.getClientSocket() != null)
 				clientReceiver.getClientSocket().close();
-			if(clientListener != null)
+			if(clientListener != null && clientListener.getListenSocket() != null)
 				clientListener.getListenSocket().close();
 			
 			// close connection with main server
-			if(cm.getMySocket() != null)
+			if(cm != null && cm.getMySocket() != null)
 				cm.getMySocket().close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

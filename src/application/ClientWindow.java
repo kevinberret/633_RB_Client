@@ -23,11 +23,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import com.sun.glass.events.KeyEvent;
 
 public class ClientWindow extends JFrame{
 	// GUI Elements
@@ -44,7 +48,6 @@ public class ClientWindow extends JFrame{
 	private JList<String> jlFiles;
 	private JComboBox<String> jcbNetworkInterfaces;
 	private JButton btnValidate;
-	private JProgressBar jpbOverallProgress;
 	private ClientProgressBar jpbCurrentProgress;
 	
 	// Application Elements
@@ -85,16 +88,19 @@ public class ClientWindow extends JFrame{
 		// Create menu bar and menu items and assign a task for share menu item
 		jmbMenuBar = new JMenuBar();
 		jmFile = new JMenu("File");
-		jmiShareFiles = new JMenuItem("Share");
+		jmiShareFiles = new JMenuItem("Share", KeyEvent.VK_O);
+		jmiShareFiles.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		jmiShareFiles.addActionListener(new ShareFilesAction());
 		jmiShareFiles.setEnabled(false);
-		jmiGetClients = new JMenuItem("Get clients");
+		jmiGetClients = new JMenuItem("Get clients", KeyEvent.VK_G);
+		jmiGetClients.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.CTRL_MASK));
 		jmiGetClients.addActionListener(new GetClientAction());
 		jmiGetClients.setEnabled(false);
 		jmFile.add(jmiShareFiles);
 		jmFile.add(jmiGetClients);
 		jmEdit = new JMenu("Edit");
-		jmiSettings = new JMenuItem("Settings");
+		jmiSettings = new JMenuItem("Settings", KeyEvent.VK_S);
+		jmiSettings.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		jmiSettings.addActionListener(new SettingsAction(this));
 		jmEdit.add(jmiSettings);		
 		jmbMenuBar.add(jmFile);
@@ -103,6 +109,7 @@ public class ClientWindow extends JFrame{
 		
 		// Display client ip address
 		JPanel pnlTop = new JPanel(new BorderLayout());
+		pnlTop.setBorder(new EmptyBorder(10, 10, 10, 10));
 		JLabel lblIPAddress = new JLabel("Select your network interface...");		
 		jcbNetworkInterfaces = new JComboBox<String>();
 		btnValidate = new JButton("Validate");
@@ -118,18 +125,10 @@ public class ClientWindow extends JFrame{
 		
 		// Create progress bars
 		jpbCurrentProgress = new ClientProgressBar(model);
-		JPanel pnlProgressBars = new JPanel();
 		JPanel pnlCurrent = new JPanel();
-		JLabel lblCurrentProgress = new JLabel("Current file");
+		JLabel lblCurrentProgress = new ClientFileName(model);
 		pnlCurrent.add(lblCurrentProgress, BorderLayout.WEST);
-		pnlCurrent.add(jpbCurrentProgress, BorderLayout.CENTER);
-		jpbOverallProgress = new JProgressBar(0, 100);
-		JPanel pnlOverall = new JPanel();
-		JLabel lblOverall = new JLabel("Overall progress");
-		pnlOverall.add(lblOverall, BorderLayout.WEST);
-		pnlOverall.add(jpbOverallProgress, BorderLayout.CENTER);	
-		pnlProgressBars.add(pnlCurrent, BorderLayout.NORTH);
-		pnlProgressBars.add(pnlOverall, BorderLayout.SOUTH);		
+		pnlCurrent.add(jpbCurrentProgress, BorderLayout.SOUTH);		
 		
 		// Add button to get files from other client
 		btnGetFiles = new JButton("Get files");
@@ -137,7 +136,7 @@ public class ClientWindow extends JFrame{
 		btnGetFiles.setEnabled(false);
 		pnlBottom = new JPanel();
 		pnlBottom.add(btnGetFiles, BorderLayout.WEST);
-		pnlBottom.add(pnlProgressBars, BorderLayout.CENTER);
+		pnlBottom.add(pnlCurrent, BorderLayout.SOUTH);
 		pnlBottom.setVisible(false);
 		
 		// Add elements to the frame

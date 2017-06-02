@@ -36,6 +36,7 @@ public class ClientModel extends Observable{
 	private Properties props;
 	
 	private int currentProgress;
+	private String fileName;
 	
 	public ClientModel() {
 		// Get application settings
@@ -265,7 +266,7 @@ public class ClientModel extends Observable{
 	}
 	
 	/*
-	 * Observable methods
+	 * Observable getters and setters methods
 	 */
 	public int getCurrentProgress() {
 		return currentProgress;
@@ -275,6 +276,16 @@ public class ClientModel extends Observable{
 		this.currentProgress = currentProgress;
 		setChanged();
 		notifyObservers();
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+		setChanged();
+		notifyObservers();
+	}
+	
+	public String getFileName() {
+		return fileName;
 	}
 	
 }
