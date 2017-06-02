@@ -5,12 +5,10 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.io.File;
-import java.net.NetworkInterface;
 import java.util.ArrayList;
-
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -23,7 +21,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -121,9 +118,12 @@ public class ClientWindow extends JFrame{
 		// Add elements to the frame
 		add(pnlBottom, BorderLayout.SOUTH);
 		add(btnGetFiles, BorderLayout.EAST);
+				
+		// add closing listener
+		addWindowListener(new CloseWindow(this, controller));
 		
 		pack();
-	}
+	}	
 	
 	public ClientWindow(ClientController controller) {		
 		this.controller = controller;
@@ -137,10 +137,11 @@ public class ClientWindow extends JFrame{
 	}
 	
 	private class SettingsAction implements ActionListener{
-		private JFrame frame;
+		private JFrame frame;		
 		
 		public SettingsAction(JFrame frame) {
 			this.frame = frame;
+			
 		}
 		
 		@Override
@@ -148,6 +149,27 @@ public class ClientWindow extends JFrame{
 			Dialog modal = new ClientSettings(frame, "Settings", true, controller);
 			modal.setVisible(true);
 		}		
+	}
+	
+	private class CloseWindow extends WindowAdapter{
+		private JFrame frame;
+		private ClientController cc;
+		
+		public CloseWindow(JFrame frame, ClientController cc) {
+			this.frame = frame;
+			this.cc = cc;
+		}
+		
+		@Override
+	    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+	        if (JOptionPane.showConfirmDialog(frame, "Are you sure you want to close this window?", "Close the window", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+	        	// close the socket
+	            cc.closeConnections();
+	        	
+	            // quit the application
+	        	dispose();	           
+	        }
+	    }
 	}
 	
 	private class ChooseIPAction implements ActionListener{
@@ -186,18 +208,14 @@ public class ClientWindow extends JFrame{
 	}
 	
 	private class GetFiles implements ActionListener{
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("get files button clicked");
 			if(!controller.getFiles(clientAsServerIP, jlFiles.getSelectedValuesList()))
 				showErrorDialog("Error", "Error while connecting to the server...", JOptionPane.ERROR_MESSAGE);
-		}
-		
+		}		
 	}
 	
-	private class GetClientAction implements ActionListener{	
-
+	private class GetClientAction implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// Get all the clients
@@ -233,7 +251,7 @@ public class ClientWindow extends JFrame{
 			}
 			
 			revalidate();
-		}		
+		}	
 	}
 	
 	class SelectClient implements ListSelectionListener {

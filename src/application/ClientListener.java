@@ -12,6 +12,10 @@ public class ClientListener implements Runnable {
 	public ClientListener(int clientAsServerPort, String folder) {
 		this.clientAsServerPort = clientAsServerPort;
 		this.folder = folder;
+	}	
+	
+	public ServerSocket getListenSocket() {
+		return listenSocket;
 	}
 	
 	@Override

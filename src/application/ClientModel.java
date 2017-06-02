@@ -17,9 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.ResourceBundle;
-
-import javax.swing.JOptionPane;
 
 public class ClientModel {
 	private String serverName;
@@ -79,10 +76,14 @@ public class ClientModel {
 		return clientTimeOut;
 	}
 	
+	public Socket getMySocket() {
+		return mySocket;
+	}	
+	
 	/*
 	 * SETTERS
 	 */
-	
+
 	public void setClientName(String ip) {
 		clientName = ip;
 	}	
