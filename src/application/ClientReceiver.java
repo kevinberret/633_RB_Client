@@ -70,7 +70,7 @@ public class ClientReceiver  extends Observable implements Runnable{
 
 			    for(int j = 0; j < fileLength; j++){ 
 			    	bos.write(bis.read());
-			    	model.setCurrentProgress((int) ((j * 100) / fileLength));
+			    	model.setCurrentProgress((int) ((j / fileLength) * 100));
 			    }
 
 			    model.setCurrentProgress(100);
