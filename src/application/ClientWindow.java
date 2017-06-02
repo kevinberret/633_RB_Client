@@ -20,6 +20,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
@@ -40,15 +41,18 @@ public class ClientWindow extends JFrame{
 	private JList<String> jlClients;
 	private JScrollPane listClientsScroller;
 	private JList<String> jlFiles;
-	
-	private String clientAsServerIP;
-	private ArrayList<String> clients;
-	private ArrayList<Object> clientsList;
-	
-	private ClientController controller;
 	private JComboBox<String> jcbNetworkInterfaces;
 	private JButton btnValidate;
+	private JProgressBar jpbOverallProgress;
+	private JProgressBar jpbCurrentProgress;
 	
+	// Application Elements
+	private String clientAsServerIP;
+	private ArrayList<String> clients;
+	private ArrayList<Object> clientsList;	
+	private ClientController controller;
+	private JPanel pnlBottom;
+		
 	private void generateGUI(){
 		// Stops the program when frame is closed		
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -96,28 +100,48 @@ public class ClientWindow extends JFrame{
 		setJMenuBar(jmbMenuBar);		
 		
 		// Display client ip address
-		JPanel pnlBottom = new JPanel(new BorderLayout());
+		JPanel pnlTop = new JPanel(new BorderLayout());
 		JLabel lblIPAddress = new JLabel("Select your network interface...");		
 		jcbNetworkInterfaces = new JComboBox<String>();
 		btnValidate = new JButton("Validate");
 		btnValidate.addActionListener(new ChooseIPAction());
 		
-		pnlBottom.add(lblIPAddress, BorderLayout.WEST);
-		pnlBottom.add(jcbNetworkInterfaces, BorderLayout.CENTER);
-		pnlBottom.add(btnValidate, BorderLayout.EAST);
+		pnlTop.add(lblIPAddress, BorderLayout.WEST);
+		pnlTop.add(jcbNetworkInterfaces, BorderLayout.CENTER);
+		pnlTop.add(btnValidate, BorderLayout.EAST);
 		
 		for (String netint : controller.getNetworkInterfaces()) {
 			jcbNetworkInterfaces.addItem(netint);
 		}
 		
+		// Create progress bars
+		jpbCurrentProgress = new JProgressBar(0, 100);
+		JPanel pnlProgressBars = new JPanel();
+		JPanel pnlCurrent = new JPanel();
+		JLabel lblCurrentProgress = new JLabel("Current file");
+		pnlCurrent.add(lblCurrentProgress, BorderLayout.WEST);
+		pnlCurrent.add(jpbCurrentProgress, BorderLayout.CENTER);
+		jpbOverallProgress = new JProgressBar(0, 100);
+		JPanel pnlOverall = new JPanel();
+		JLabel lblOverall = new JLabel("Overall progress");
+		pnlOverall.add(lblOverall, BorderLayout.WEST);
+		pnlOverall.add(jpbOverallProgress, BorderLayout.CENTER);	
+		pnlProgressBars.add(pnlCurrent, BorderLayout.NORTH);
+		pnlProgressBars.add(pnlOverall, BorderLayout.SOUTH);
+		
 		// Add button to get files from other client
 		btnGetFiles = new JButton("Get files");
 		btnGetFiles.addActionListener(new GetFiles());
 		btnGetFiles.setEnabled(false);
+		pnlBottom = new JPanel();
+		pnlBottom.add(btnGetFiles, BorderLayout.WEST);
+		pnlBottom.add(pnlProgressBars, BorderLayout.CENTER);
+		pnlBottom.setVisible(false);
 		
 		// Add elements to the frame
+		add(pnlTop, BorderLayout.NORTH);
+		//add(btnGetFiles, BorderLayout.EAST);
 		add(pnlBottom, BorderLayout.SOUTH);
-		add(btnGetFiles, BorderLayout.EAST);
 				
 		// add closing listener
 		addWindowListener(new CloseWindow(this, controller));
@@ -129,7 +153,7 @@ public class ClientWindow extends JFrame{
 		this.controller = controller;
 		
 		// Generate the gui
-		generateGUI();				
+		generateGUI();
 	}
 	
 	public void showErrorDialog(String title, String error, int type){
@@ -213,6 +237,9 @@ public class ClientWindow extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			if(!controller.getFiles(clientAsServerIP, jlFiles.getSelectedValuesList()))
 				showErrorDialog("Error", "Error while connecting to the server...", JOptionPane.ERROR_MESSAGE);
+			
+			if(!pnlBottom.isVisible())
+				pnlBottom.setVisible(true);
 		}		
 	}
 	
