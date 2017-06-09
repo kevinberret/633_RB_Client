@@ -3,6 +3,7 @@ package application;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class ClientController {
@@ -38,12 +39,16 @@ public class ClientController {
 		return Integer.toString(cm.getClientAsServerPort());
 	}
 	
-	public ArrayList<Object> getClientsList(){
+	public LinkedHashMap<String, Client> getClientsList(){
 		return cm.getClientsList();
 	}
 	
 	public ArrayList<String> getNetworkInterfaces(){
 		return cm.getNetworkInterfaces();
+	}
+	
+	public Client getThisClient(){
+		return cm.getThisClient();
 	}
 	
 	/*
@@ -129,8 +134,11 @@ public class ClientController {
 			if(cm != null && cm.getMySocket() != null)
 				cm.getMySocket().close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public Client getClientByUuid(String uuid) {		
+		return cm.getClientByUuid(uuid);
 	}
 }

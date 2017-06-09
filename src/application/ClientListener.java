@@ -34,7 +34,6 @@ public class ClientListener implements Runnable {
 				t.start();
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}

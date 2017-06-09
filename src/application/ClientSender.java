@@ -73,10 +73,8 @@ public class ClientSender implements Runnable {
 			// Fermeture de l'objet pour envoyer les fichiers
 			dos.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

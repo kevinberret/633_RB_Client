@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Vector;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -21,7 +23,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -53,7 +54,7 @@ public class ClientWindow extends JFrame{
 	// Application Elements
 	private String clientAsServerIP;
 	private ArrayList<String> clients;
-	private ArrayList<Object> clientsList;	
+	private LinkedHashMap<String, Client> clientsList;	
 	private ClientController controller;
 	private JPanel pnlBottom;
 	private ClientModel model;
@@ -66,16 +67,12 @@ public class ClientWindow extends JFrame{
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -193,7 +190,6 @@ public class ClientWindow extends JFrame{
 	            cc.closeConnections();
 	        	
 	            // quit the application
-	            // TODO: check if dispose is better to close running threads than this line
 	            setDefaultCloseOperation(EXIT_ON_CLOSE);
 	        }
 	    }
@@ -249,14 +245,15 @@ public class ClientWindow extends JFrame{
 			clientsList = controller.getClientsList();
 			
 			// Create the model for the jlist
-			DefaultListModel<String> model;
+//			DefaultListModel<String> model;
+			Vector model;
 			
 			// Create the jlist or modify its model
 			if(jlClients != null){
-				model = (DefaultListModel<String>)jlClients.getModel();
+				model = (Vector)jlClients.getModel();
 				model.clear();
 			}else{
-				model = new DefaultListModel<String>();
+				model = new Vector();
 				jlClients = new JList(model);
 				
 				jlClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -271,11 +268,20 @@ public class ClientWindow extends JFrame{
 			}
 			
 			// Ajout des clients au modele (tous les autres que nous)
-			for(int i = 0 ; i < clientsList.size()  ; i++){
+			for (String key : clientsList.keySet())
+			{
+			    if(!key.equals(controller.getThisClient().getUuid())){
+			    	Client tmpClient = clientsList.get(key);
+			    	model.addElement(new Element(tmpClient.getUuid(), tmpClient.getClientIp()));
+			    }
+			    
+			}
+			
+			/*for(int i = 0 ; i < clientsList.size()  ; i++){
 				String client = ((ArrayList<String>)clientsList.get(i)).get(0);
 				if(!client.equals(controller.getClientName()))
 					model.addElement(client);
-			}
+			}*/
 			
 			revalidate();
 			
@@ -284,15 +290,20 @@ public class ClientWindow extends JFrame{
 		}	
 	}
 	
-	class SelectClient implements ListSelectionListener {
+	private class SelectClient implements ListSelectionListener {
 		private JScrollPane listFilesScroller;
 		
 	    public void valueChanged(ListSelectionEvent e) {
 	    	 if (e.getValueIsAdjusting()){
+	 			
 	    		// Get the jlist from which the command came
 				JList source = (JList)e.getSource();
-				ArrayList<String> client = (ArrayList<String>)clientsList.get(source.getSelectedIndex());
-				clientAsServerIP = source.getSelectedValue().toString();
+		        Element elmt = (Element)source.getSelectedValue();
+		        
+				
+//				ArrayList<String> client = (ArrayList<String>)clientsList.get(source.getSelectedIndex());
+				Client client = controller.getClientByUuid(elmt.getUuid());
+				clientAsServerIP = client.getClientIp();
 				
 				DefaultListModel<String> model;
 				
@@ -315,12 +326,36 @@ public class ClientWindow extends JFrame{
 				}
 				
 				// Begin at index 1 to get only files and not ip address
-				for (int i = 1; i < client.size(); i++) {
-				    model.addElement(client.get(i));
+				ArrayList<String> files = client.getFiles();
+				for (int i = 1; i < files.size(); i++) {
+				    model.addElement(files.get(i));
 				}				
 				
 				revalidate();
 	         }
 	    }
+	}
+	
+	private class Element{
+		private String uuid;
+		private String ip;
+		
+		public Element(String uuid, String ip){
+			this.uuid = uuid;
+			this.ip = ip;
+		}
+		
+		public String getUuid() {
+			return uuid;
+		}
+		public void setUuid(String uuid) {
+			this.uuid = uuid;
+		}
+		public String getIp() {
+			return ip;
+		}
+		public void setIp(String ip) {
+			this.ip = ip;
+		}		
 	}
 }

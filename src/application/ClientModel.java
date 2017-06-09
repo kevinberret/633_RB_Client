@@ -16,52 +16,59 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Properties;
+import java.util.UUID;
 
 public class ClientModel extends Observable{
 	// propriétés de la classe
+	private String uuid;
 	private String serverName;
-	private String clientName;
+	private String clientIp;
 	private int serverPort;
 	private int clientAsServerPort;
-	private ArrayList<String> data;
+	private ArrayList<String> filesList;
 	private File[] files;
 	private InetAddress serverAddress;
 	private Socket mySocket;
 	private ObjectOutputStream objectOutput;
-	private ArrayList<Object> clientsList;
 	private String folder;
 	private int clientTimeOut;
 	private ArrayList<String> networks;
 	private Properties props;	
 	private int currentProgress;
 	private String fileName;
+	private Client thisClient;
 	
 	public ClientModel() {
 		// Get application settings
-		getResources();
+		getResources();		
 		
 		// Get all network interfaces
 		getNetworkInterfaces();
+		
+		// Create this client object
+		thisClient = new Client(uuid, clientIp);
 	}
 	
 	/*
 	 * GETTERS
 	 */
 	public String getClientName() {
-		return clientName;
-	}
+		return clientIp;
+	}	
 	
+	public String getUuid() {
+		return uuid;
+	}
+
 	public int getClientAsServerPort() {
 		return clientAsServerPort;
 	}
 
-	public ArrayList<Object> getClientsList() {
-		if (clientsList == null)
-			return getClientFiles();
-		
-		return clientsList;
+	public LinkedHashMap<String, Client> getClientsList() {
+		return getClientFiles();
 	}
 	
 	public String getFolder() {
@@ -82,14 +89,18 @@ public class ClientModel extends Observable{
 	
 	public Socket getMySocket() {
 		return mySocket;
-	}	
+	}
+	
+	public Client getThisClient() {
+		return thisClient;
+	}
 	
 	/*
 	 * SETTERS
 	 */
 
 	public void setClientName(String ip) {
-		clientName = ip;
+		clientIp = ip;
 	}	
 
 	public void setServerName(String serverName) {
@@ -131,10 +142,8 @@ public class ClientModel extends Observable{
 			
 			reader.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -143,6 +152,16 @@ public class ClientModel extends Observable{
 		serverPort = Integer.parseInt(props.getProperty("server.port"));
 		clientTimeOut = Integer.parseInt(props.getProperty("client.timeout"));
 		clientAsServerPort = Integer.parseInt(props.getProperty("client.asserver.port"));
+		
+		// Récupération de l'id unique du client
+		uuid = props.getProperty("client.uuid");
+		
+		// Si le client ne possède pas d'id unique, génération d'un nouveau et sauvegarde dans le fichier config
+		if(uuid == null){
+			uuid = UUID.randomUUID().toString();
+			props.setProperty("client.uuid", uuid);
+			saveSettings();
+		}
 	}
 	
 	// Sauvegarde des paramètres
@@ -158,7 +177,6 @@ public class ClientModel extends Observable{
 			writer.close();
 			return true;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -183,7 +201,6 @@ public class ClientModel extends Observable{
 		            }
 		        }
 			} catch (SocketException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -212,16 +229,18 @@ public class ClientModel extends Observable{
 			mySocket.connect(new InetSocketAddress(serverAddress, serverPort), clientTimeOut);
 			
 			// Création d'une arraylist de string qui contient les adresses ip des clients et leurs fichiers
-			data = new ArrayList<String>();
+			filesList = new ArrayList<String>();
 			
 			// Ajout de l'ip du client
-			data.add(clientName);
+			//data.add(clientIp);
 			
 			// Ajout des fichiers du client
 			for (File file : files) {
 				if(!file.isDirectory())
-					data.add(file.getName());
+					filesList.add(file.getName());
 			}
+			
+			thisClient.setFiles(filesList);
 			
 			// Objectoutputstream pour envoyer des données
 			objectOutput = new ObjectOutputStream(mySocket.getOutputStream());
@@ -231,7 +250,7 @@ public class ClientModel extends Observable{
 			objectOutput.flush();
 			
 			// Envoi de l'adresse ip et des fichiers partagés
-			objectOutput.writeObject(data);
+			objectOutput.writeObject(thisClient);
 			objectOutput.flush();
 			
 			// retourne vrai si enregistrement ok
@@ -247,7 +266,7 @@ public class ClientModel extends Observable{
 	}
 	
 	// Récupérer la liste des clients et leurs fichiers
-	public ArrayList<Object> getClientFiles(){
+	public LinkedHashMap<String, Client> getClientFiles(){
 		try {
 			// Informer le serveur que nous voulons récupérer les clients et la liste des fichiers qu'ils partagent
 			objectOutput.writeObject(new String("getfiles"));
@@ -255,13 +274,33 @@ public class ClientModel extends Observable{
 			
 			// Récupérer les infos voulues
 			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
-			clientsList = (ArrayList<Object>) objectInputStream.readObject();
-			return clientsList;
+			return (LinkedHashMap<String, Client>) objectInputStream.readObject();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// en cas d'erreur, retour objet null
+		return null;
+	}
+	
+	// Récupérer un client par son unique id
+	public Client getClientByUuid(String uuid){
+		try {
+			// Informer le serveur que nous voulons récupérer un client et envoi du uuid du client désiré
+			objectOutput.writeObject(new String("getclientbyuuid"));
+			objectOutput.flush();
+			
+			objectOutput.writeObject(uuid);
+			objectOutput.flush();
+			
+			// Récupérer les infos voulues
+			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
+			return (Client) objectInputStream.readObject();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		
