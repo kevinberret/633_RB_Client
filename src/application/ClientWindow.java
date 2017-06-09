@@ -270,10 +270,10 @@ public class ClientWindow extends JFrame{
 				add(listClientsScroller, BorderLayout.WEST);
 			}
 			
-			// Add clients to the model
+			// Ajout des clients au modele (tous les autres que nous)
 			for(int i = 0 ; i < clientsList.size()  ; i++){
 				String client = ((ArrayList<String>)clientsList.get(i)).get(0);
-				//if(!client.equals(controller.getClientName()))
+				if(!client.equals(controller.getClientName()))
 					model.addElement(client);
 			}
 			
