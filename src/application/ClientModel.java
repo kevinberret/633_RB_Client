@@ -49,7 +49,7 @@ public class ClientModel extends Observable{
 		getNetworkInterfaces();
 		
 		// Create this client object
-		thisClient = new Client(uuid, clientIp);
+		thisClient = new Client(uuid);
 	}
 	
 	/*
@@ -101,6 +101,7 @@ public class ClientModel extends Observable{
 
 	public void setClientName(String ip) {
 		clientIp = ip;
+		thisClient.setClientIp(ip);
 	}	
 
 	public void setServerName(String serverName) {

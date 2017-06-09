@@ -17,9 +17,15 @@ public class Client implements Serializable {
 	}
 	
 	public Client(String uuid, String clientIp) {
-		this.uuid = uuid;
-		this.clientIp = clientIp;
-		this.files = null;
+		this(uuid, clientIp, null);
+	}
+	
+	public Client(String uuid) {
+		this(uuid, null, null);
+	}
+	
+	public Client() {
+		this(null, null, null);
 	}
 
 	public String getUuid() {
