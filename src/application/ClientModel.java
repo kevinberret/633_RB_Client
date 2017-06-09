@@ -36,7 +36,7 @@ public class ClientModel extends Observable{
 	private String folder;
 	private int clientTimeOut;
 	private ArrayList<String> networks;
-	private Properties props;	
+	private Properties properties;	
 	private int currentProgress;
 	private String fileName;
 	private Client thisClient;
@@ -105,22 +105,22 @@ public class ClientModel extends Observable{
 	}	
 
 	public void setServerName(String serverName) {
-		props.setProperty("server.ip", serverName);
+		properties.setProperty("server.ip", serverName);
 		this.serverName = serverName;
 	}	
 
 	public void setServerPort(int serverPort) {
-		props.setProperty("server.port", Integer.toString(serverPort));
+		properties.setProperty("server.port", Integer.toString(serverPort));
 		this.serverPort = serverPort;
 	}	
 
 	public void setClientTimeOut(int clientTimeOut) {
-		props.setProperty("client.timeout", Integer.toString(clientTimeOut));
+		properties.setProperty("client.timeout", Integer.toString(clientTimeOut));
 		this.clientTimeOut = clientTimeOut;
 	}
 
 	public void setClientAsServerPort(int clientAsServerPort) {
-		props.setProperty("client.asserver.port", Integer.toString(clientAsServerPort));		
+		properties.setProperty("client.asserver.port", Integer.toString(clientAsServerPort));		
 		this.clientAsServerPort = clientAsServerPort;
 	}
 
@@ -131,17 +131,17 @@ public class ClientModel extends Observable{
 		// source : http://www.codejava.net/coding/reading-and-writing-configuration-for-java-application-using-properties-class#CreateProperties
 		// Récupération des paramètres enregistrés
 		File configFile;		 
-		FileReader reader;
-		props = new Properties();
+		FileReader fr;
+		properties = new Properties();
 		
 		try {
 			configFile = new File("config.properties");
-			reader = new FileReader(configFile);			
+			fr = new FileReader(configFile);			
 			
-			// Chargement des paramètres
-			props.load(reader);
+			// Chargement des paramètres depuis le fichier
+			properties.load(fr);
 			
-			reader.close();
+			fr.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -149,18 +149,18 @@ public class ClientModel extends Observable{
 		}
 		
 		// Définition des paramètres de l'application
-		serverName = props.getProperty("server.ip");
-		serverPort = Integer.parseInt(props.getProperty("server.port"));
-		clientTimeOut = Integer.parseInt(props.getProperty("client.timeout"));
-		clientAsServerPort = Integer.parseInt(props.getProperty("client.asserver.port"));
+		serverName = properties.getProperty("server.ip");
+		serverPort = Integer.parseInt(properties.getProperty("server.port"));
+		clientTimeOut = Integer.parseInt(properties.getProperty("client.timeout"));
+		clientAsServerPort = Integer.parseInt(properties.getProperty("client.asserver.port"));
 		
 		// Récupération de l'id unique du client
-		uuid = props.getProperty("client.uuid");
+		uuid = properties.getProperty("client.uuid");
 		
 		// Si le client ne possède pas d'id unique, génération d'un nouveau et sauvegarde dans le fichier config
 		if(uuid == null){
 			uuid = UUID.randomUUID().toString();
-			props.setProperty("client.uuid", uuid);
+			properties.setProperty("client.uuid", uuid);
 			saveSettings();
 		}
 	}
@@ -169,13 +169,13 @@ public class ClientModel extends Observable{
 	public boolean saveSettings(){
 		// Création du fichier dans lequel seront enregistrées les données
 		File configFile = new File("config.properties");		
-		FileWriter writer;
+		FileWriter fw;
 		
 		// Sauvegarde des données
 		try {
-			writer = new FileWriter(configFile);
-			props.store(writer, "application settings");
-			writer.close();
+			fw = new FileWriter(configFile);
+			properties.store(fw, "application settings");
+			fw.close();
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
