@@ -1,8 +1,9 @@
 package application;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Client {
+public class Client implements Serializable {
 	private String uuid;
 	private String clientIp;
 	private ArrayList<String> files;
