@@ -126,8 +126,8 @@ public class ClientWindow extends JFrame{
 		// Create progress bars
 		jpbCurrentProgress = new ClientProgressBar(model);
 		JPanel pnlCurrent = new JPanel();
-		//JLabel lblCurrentProgress = new ClientFileName(model);
-		//pnlCurrent.add(lblCurrentProgress, BorderLayout.WEST);
+		JLabel lblCurrentProgress = new ClientFileName(model);
+		pnlCurrent.add(lblCurrentProgress, BorderLayout.WEST);
 		pnlCurrent.add(jpbCurrentProgress, BorderLayout.SOUTH);		
 		
 		// Add button to get files from other client
