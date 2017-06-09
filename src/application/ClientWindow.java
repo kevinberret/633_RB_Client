@@ -48,6 +48,7 @@ public class ClientWindow extends JFrame{
 	private Vector<Element> clientsListModel;
 	private JScrollPane listClientsScroller;
 	private JList<String> jlFiles;
+	private DefaultListModel<String> filesModel;
 	private JComboBox<String> jcbNetworkInterfaces;
 	private JButton btnValidate;
 	private ClientProgressBar jpbCurrentProgress;
@@ -243,12 +244,13 @@ public class ClientWindow extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			// Récupération de tous les clients
 			clientsList = controller.getClientsList();
-			System.out.println("ok");
 			
 			// Créée la liste ou la modifie si déjà existante et désélectionne tout
 			if(jlClients != null){
 				clientsListModel.clear();
+				filesModel.clear();
 				jlClients.clearSelection();
+				jlFiles.clearSelection();
 			}else{
 				clientsListModel = new Vector<Element>();
 				jlClients = new JList(clientsListModel);
@@ -281,7 +283,7 @@ public class ClientWindow extends JFrame{
 	}
 	
 	private class SelectClient implements ListSelectionListener {
-		private JScrollPane listFilesScroller;
+		private JScrollPane listFilesScroller;		
 		
 	    public void valueChanged(ListSelectionEvent e) {
 	    	 if (e.getValueIsAdjusting()){
@@ -293,15 +295,12 @@ public class ClientWindow extends JFrame{
 				Client client = controller.getClientByUuid(elmt.getUuid());
 				clientAsServerIP = client.getClientIp();
 				
-				DefaultListModel<String> model;
-				
 				// Création de la jlist ou modification
 				if(jlFiles != null){
-					model = (DefaultListModel<String>)jlFiles.getModel();
-					model.clear();
+					filesModel.clear();
 				}else{
-					model = new DefaultListModel<String>();
-					jlFiles = new JList(model);				
+					filesModel = new DefaultListModel<String>();
+					jlFiles = new JList(filesModel);				
 					btnGetFiles.setEnabled(true);
 		 			
 					jlFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -316,7 +315,7 @@ public class ClientWindow extends JFrame{
 				// Ajout de tous les fichiers dans le model pour afficher sur la liste des fichiers à disposition
 				ArrayList<String> files = client.getFiles();
 				for (String file : files) {
-				    model.addElement(file);
+				    filesModel.addElement(file);
 				}			
 				
 				revalidate();
