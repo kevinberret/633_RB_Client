@@ -35,7 +35,7 @@ import javax.swing.event.ListSelectionListener;
 import com.sun.glass.events.KeyEvent;
 
 public class ClientWindow extends JFrame{
-	// GUI Elements
+	// Eléments GUI
 	private JFileChooser jfcChoose;
 	private JMenuBar jmbMenuBar;
 	private JMenu jmFile;
@@ -45,13 +45,14 @@ public class ClientWindow extends JFrame{
 	private JMenuItem jmiSettings;
 	private JButton btnGetFiles;
 	private JList<String> jlClients;
+	private Vector<Element> clientsListModel;
 	private JScrollPane listClientsScroller;
 	private JList<String> jlFiles;
 	private JComboBox<String> jcbNetworkInterfaces;
 	private JButton btnValidate;
 	private ClientProgressBar jpbCurrentProgress;
 	
-	// Application Elements
+	// Eléments de l'application
 	private String clientAsServerIP;
 	private ArrayList<String> clients;
 	private LinkedHashMap<String, Client> clientsList;	
@@ -60,10 +61,10 @@ public class ClientWindow extends JFrame{
 	private ClientModel model;
 		
 	private void generateGUI(){
-		// Don't stop the program when frame is closed		
+		// ne ferme pas l'application quand la fenêtre est fermée	
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
-		// Get system presentation
+		// Récupération du style d'affichage de l'os sur lequel le client est exécuté
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException e) {
@@ -76,13 +77,11 @@ public class ClientWindow extends JFrame{
 			e.printStackTrace();
 		}
 		
-		// Set desired size
+		// Taille et titre
 		setPreferredSize(new Dimension(1024,768));
-		
-		// Set the frame title
 		setTitle("Client p2p");
 		
-		// Create menu bar and menu items and assign a task for share menu item
+		// Création du menubar, des éléments du menu et assignation de tâches et raccourcis clavier
 		jmbMenuBar = new JMenuBar();
 		jmFile = new JMenu("File");
 		jmiShareFiles = new JMenuItem("Share", KeyEvent.VK_O);
@@ -104,7 +103,7 @@ public class ClientWindow extends JFrame{
 		jmbMenuBar.add(jmEdit);
 		setJMenuBar(jmbMenuBar);		
 		
-		// Display client ip address
+		// Sélection de l'adresse ip
 		JPanel pnlTop = new JPanel(new BorderLayout());
 		pnlTop.setBorder(new EmptyBorder(10, 10, 10, 10));
 		JLabel lblIPAddress = new JLabel("Select your network interface...");		
@@ -112,6 +111,7 @@ public class ClientWindow extends JFrame{
 		btnValidate = new JButton("Validate");
 		btnValidate.addActionListener(new ChooseIPAction());
 		
+		// Ajout des éléments au panel du sommet
 		pnlTop.add(lblIPAddress, BorderLayout.WEST);
 		pnlTop.add(jcbNetworkInterfaces, BorderLayout.CENTER);
 		pnlTop.add(btnValidate, BorderLayout.EAST);
@@ -120,14 +120,14 @@ public class ClientWindow extends JFrame{
 			jcbNetworkInterfaces.addItem(netint);
 		}
 		
-		// Create progress bars
+		// Création des barres de progression
 		jpbCurrentProgress = new ClientProgressBar(model);
 		JPanel pnlCurrent = new JPanel();
 		JLabel lblCurrentProgress = new ClientFileName(model);
 		pnlCurrent.add(lblCurrentProgress, BorderLayout.WEST);
 		pnlCurrent.add(jpbCurrentProgress, BorderLayout.SOUTH);		
 		
-		// Add button to get files from other client
+		// Ajout du bouton pour récupérer les fichiers depuis l'autre client
 		btnGetFiles = new JButton("Get files");
 		btnGetFiles.addActionListener(new GetFiles());
 		btnGetFiles.setEnabled(false);
@@ -136,12 +136,11 @@ public class ClientWindow extends JFrame{
 		pnlBottom.add(pnlCurrent, BorderLayout.SOUTH);
 		pnlBottom.setVisible(false);
 		
-		// Add elements to the frame
+		// Ajout des éléments à la frame
 		add(pnlTop, BorderLayout.NORTH);
-		//add(btnGetFiles, BorderLayout.EAST);
 		add(pnlBottom, BorderLayout.SOUTH);
 				
-		// add closing listener
+		// Ajout d'un listener sur la fermeture de la fenêtre (permet de gérer la déconnexion)
 		addWindowListener(new CloseWindow(this, controller));
 		
 		pack();
@@ -151,7 +150,7 @@ public class ClientWindow extends JFrame{
 		this.controller = controller;
 		this.model = model;
 		
-		// Generate the gui
+		// Generation de la gui
 		generateGUI();
 	}
 	
@@ -186,10 +185,10 @@ public class ClientWindow extends JFrame{
 		@Override
 	    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 	        if (JOptionPane.showConfirmDialog(frame, "Are you sure you want to close this window?", "Close the window", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-	        	// close the sockets
+	        	// fermeture des sockets
 	            cc.closeConnections();
 	        	
-	            // quit the application
+	            // fermeture de l'application
 	            setDefaultCloseOperation(EXIT_ON_CLOSE);
 	        }
 	    }
@@ -198,10 +197,10 @@ public class ClientWindow extends JFrame{
 	private class ChooseIPAction implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// Set IP address choosed by user in the controller
+			// Définition de l'adresse ip choisie par l'utilisateur
 			controller.setClientIp(jcbNetworkInterfaces.getSelectedItem().toString());
 			
-			// Modify the gui
+			// Modification de l'interface graphique
 			btnValidate.setEnabled(false);
 			jcbNetworkInterfaces.setEnabled(false);
 			jmiShareFiles.setEnabled(true);
@@ -211,14 +210,14 @@ public class ClientWindow extends JFrame{
 	private class ShareFilesAction implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// Generate jfilechooser
+			// Generation jfilechooser
 			jfcChoose = new JFileChooser(); 
 			jfcChoose.setCurrentDirectory(new File("files"));
 			jfcChoose.setDialogTitle("Choose a folder to share");
 			jfcChoose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			jfcChoose.setAcceptAllFileFilterUsed(false);
 			
-			// Get desired folder and file list
+			// Récupération du dossier désiré et des fichiers
 			String selectedFolder;			
 		    if (jfcChoose.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 		    	selectedFolder = jfcChoose.getSelectedFile().toString();
@@ -238,22 +237,21 @@ public class ClientWindow extends JFrame{
 		}		
 	}
 	
-	private class GetClientAction implements ActionListener{
+	private class GetClientAction implements ActionListener{		
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// Get all the clients
+			// Récupération de tous les clients
 			clientsList = controller.getClientsList();
 			System.out.println("ok");
-			// Create the model for the jlist
-			Vector model;
 			
-			// Create the jlist or modify its model
+			// Créée la liste ou la modifie si déjà existante et désélectionne tout
 			if(jlClients != null){
-				model = (Vector)jlClients.getModel();
-				model.clear();
+				clientsListModel.clear();
+				jlClients.clearSelection();
 			}else{
-				model = new Vector();
-				jlClients = new JList(model);
+				clientsListModel = new Vector<Element>();
+				jlClients = new JList(clientsListModel);
 				
 				jlClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 				jlClients.setLayoutOrientation(JList.VERTICAL);
@@ -271,9 +269,8 @@ public class ClientWindow extends JFrame{
 			{			    
 			    if(!key.equals(controller.getThisClient().getUuid())){
 			    	Client tmpClient = clientsList.get(key);
-			    	model.addElement(new Element(tmpClient.getUuid(), tmpClient.getClientIp()));
-			    }
-			    
+			    	clientsListModel.addElement(new Element(tmpClient.getUuid(), tmpClient.getClientIp()));
+			    }			    
 			}
 			
 			revalidate();
@@ -289,18 +286,16 @@ public class ClientWindow extends JFrame{
 	    public void valueChanged(ListSelectionEvent e) {
 	    	 if (e.getValueIsAdjusting()){
 	 			
-	    		// Get the jlist from which the command came
+	    		// Récupérer la jlist source
 				JList source = (JList)e.getSource();
 		        Element elmt = (Element)source.getSelectedValue();		        
 				
 				Client client = controller.getClientByUuid(elmt.getUuid());
 				clientAsServerIP = client.getClientIp();
 				
-				System.out.println(client.getClientIp() + " - " + client.getUuid());
-				
 				DefaultListModel<String> model;
 				
-				// Create the jlist or modify its model
+				// Création de la jlist ou modification
 				if(jlFiles != null){
 					model = (DefaultListModel<String>)jlFiles.getModel();
 					model.clear();
@@ -318,10 +313,9 @@ public class ClientWindow extends JFrame{
 					add(listFilesScroller, BorderLayout.CENTER);
 				}
 				
-				// Begin at index 1 to get only files and not ip address
+				// Ajout de tous les fichiers dans le model pour afficher sur la liste des fichiers à disposition
 				ArrayList<String> files = client.getFiles();
 				for (String file : files) {
-					System.out.println(file);
 				    model.addElement(file);
 				}			
 				
