@@ -1,10 +1,9 @@
 package application;
 
-import java.io.File;
 import java.net.ServerSocket;
-import java.util.ArrayList;
 
 public class ClientListener implements Runnable {
+	// propriétés de la classe
 	private ServerSocket listenSocket = null;
 	private int clientAsServerPort;
 	private String folder;
@@ -14,6 +13,9 @@ public class ClientListener implements Runnable {
 		this.folder = folder;
 	}	
 	
+	/*
+	 * GETTERS
+	 */
 	public ServerSocket getListenSocket() {
 		return listenSocket;
 	}
@@ -21,9 +23,11 @@ public class ClientListener implements Runnable {
 	@Override
 	public void run() {
 		try {
+			// Démarrage du socket en tant que serveur
 			listenSocket = new ServerSocket(clientAsServerPort);
 
 			while(true){
+				// Ouverture de socket avec un client et démarrage de l'envoi dans un thread
 				ClientSender cs = new ClientSender(listenSocket.accept(), folder);
 				
 				Thread t = new Thread(cs);

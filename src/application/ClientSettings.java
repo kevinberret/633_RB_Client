@@ -8,6 +8,7 @@ import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -24,6 +25,7 @@ import javax.swing.border.EmptyBorder;
  *
  */
 public class ClientSettings extends Dialog {
+	// propriétés de la classe
 	private ClientController cc;
 	private JTextField jtfServerName;
 	private JTextField jtfServerPort;
@@ -34,8 +36,16 @@ public class ClientSettings extends Dialog {
 	public ClientSettings(JFrame frame, String title, boolean modal, ClientController cc) {
 		super(frame, title, modal);
 		this.cc = cc;
-		this.frame = (ClientWindow) frame;
+		this.frame = (ClientWindow) frame;	
 		
+		// création de l'affichage
+		generateGUI();
+		
+		pack();
+	}
+	
+	private void generateGUI(){
+		// Génération de la gui
 		JPanel pnlCenter = new JPanel();
 		pnlCenter.setBorder(new EmptyBorder(10, 10, 10, 10));
 		JLabel lblServerName = new JLabel("Server IP");
@@ -68,65 +78,30 @@ public class ClientSettings extends Dialog {
 		add(pnlBottom, BorderLayout.SOUTH);
 		
 		addWindowListener(new CloseAction());
-		
-		pack();
 	}
 	
-	class CloseAction implements WindowListener{
-
-		@Override
-		public void windowOpened(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
+	/*
+	 * EVENTS
+	 */
+	
+	class CloseAction extends WindowAdapter{
 		@Override
 		public void windowClosing(WindowEvent e) {
-			// TODO Auto-generated method stub
+			// à la fermeture de la fenêtre de settings, fermeture du dialog
 			dispose();
-		}
-
-		@Override
-		public void windowClosed(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowIconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowDeiconified(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowActivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void windowDeactivated(WindowEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-		
+		}		
 	}
 
 	class SaveAction implements ActionListener{
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
+			// Récupération des infos entrées et définition via le controller
 			cc.setClientAsServerPort(jtfClientAsServerPort.getText());
 			cc.setClientTimeOut(jtfClientTimeOut.getText());
 			cc.setServerName(jtfServerName.getText());
 			cc.setServerPort(jtfServerPort.getText());
+			
+			// Tentative de sauvegarde et affichage du succès ou de l'erreur
 			if(cc.saveSettings()){
 				dispose();
 				frame.showErrorDialog("Saved", "Settings saved successfully", JOptionPane.INFORMATION_MESSAGE);

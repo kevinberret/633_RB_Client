@@ -6,6 +6,5 @@ public class ClientMain {
 		ClientController cc = new ClientController(cm);
 		ClientWindow cw = new ClientWindow(cc, cm);
 		cw.setVisible(true);
-	}
-	
+	}	
 }

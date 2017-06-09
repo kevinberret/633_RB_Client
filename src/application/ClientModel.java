@@ -20,6 +20,7 @@ import java.util.Observable;
 import java.util.Properties;
 
 public class ClientModel extends Observable{
+	// propriétés de la classe
 	private String serverName;
 	private String clientName;
 	private int serverPort;
@@ -33,8 +34,7 @@ public class ClientModel extends Observable{
 	private String folder;
 	private int clientTimeOut;
 	private ArrayList<String> networks;
-	private Properties props;
-	
+	private Properties props;	
 	private int currentProgress;
 	private String fileName;
 	
@@ -117,6 +117,7 @@ public class ClientModel extends Observable{
 	 */	
 	private void getResources(){
 		// source : http://www.codejava.net/coding/reading-and-writing-configuration-for-java-application-using-properties-class#CreateProperties
+		// Récupération des paramètres enregistrés
 		File configFile;		 
 		FileReader reader;
 		props = new Properties();
@@ -125,7 +126,7 @@ public class ClientModel extends Observable{
 			configFile = new File("config.properties");
 			reader = new FileReader(configFile);			
 			
-			// load the properties file
+			// Chargement des paramètres
 			props.load(reader);
 			
 			reader.close();
@@ -137,23 +138,20 @@ public class ClientModel extends Observable{
 			e.printStackTrace();
 		}
 		
+		// Définition des paramètres de l'application
 		serverName = props.getProperty("server.ip");
 		serverPort = Integer.parseInt(props.getProperty("server.port"));
 		clientTimeOut = Integer.parseInt(props.getProperty("client.timeout"));
-		clientAsServerPort = Integer.parseInt(props.getProperty("client.asserver.port"));		
-		
-		/*
-		ResourceBundle bundle = ResourceBundle.getBundle("application.properties.config");
-		serverName = bundle.getString("server.ip");
-		serverPort = Integer.parseInt(bundle.getString("server.port"));
-		clientAsServerPort = Integer.parseInt(bundle.getString("client.asserver.port"));
-		clientTimeOut = Integer.parseInt(bundle.getString("client.timeout"));
-		*/
+		clientAsServerPort = Integer.parseInt(props.getProperty("client.asserver.port"));
 	}
 	
+	// Sauvegarde des paramètres
 	public boolean saveSettings(){
-		File configFile = new File("config.properties");
+		// Création du fichier dans lequel seront enregistrées les données
+		File configFile = new File("config.properties");		
 		FileWriter writer;
+		
+		// Sauvegarde des données
 		try {
 			writer = new FileWriter(configFile);
 			props.store(writer, "application settings");
@@ -164,9 +162,11 @@ public class ClientModel extends Observable{
 			e.printStackTrace();
 		}
 		
+		// Retourne faux en cas d'erreur d'enregistrement
 		return false;
 	}
 	
+	// Récupération de la liste des ip pour le client
 	public ArrayList<String> getNetworkInterfaces(){
 		// source : https://docs.oracle.com/javase/tutorial/networking/nifs/listing.html
 		if(networks == null){
@@ -191,6 +191,7 @@ public class ClientModel extends Observable{
 		return networks;
 	}
 	
+	// Vérification que le dossier sélectionné contient bien des fichiers à partager.
 	public boolean selectFolder(String selectedFolder){
 		folder = selectedFolder;
     	files = new File(selectedFolder).listFiles();
@@ -201,39 +202,39 @@ public class ClientModel extends Observable{
     	return false;
 	}
 	
-	
-
+	// Connexion au serveur
 	public boolean connectToServer(){		
 		try {			
 			serverAddress = InetAddress.getByName(serverName);
 
-			// Try to connect to the server
+			// Tentative de connexion au serveur
 			mySocket = new Socket();
 			mySocket.connect(new InetSocketAddress(serverAddress, serverPort), clientTimeOut);
 			
-			// Creation of the arraylist of string that contains client's ip address and files list
+			// Création d'une arraylist de string qui contient les adresses ip des clients et leurs fichiers
 			data = new ArrayList<String>();
 			
-			// Add client ip
+			// Ajout de l'ip du client
 			data.add(clientName);
 			
-			// Add all files to arraylist
+			// Ajout des fichiers du client
 			for (File file : files) {
 				if(!file.isDirectory())
 					data.add(file.getName());
 			}
 			
-			// Instantiate objectoutputstream to send data
+			// Objectoutputstream pour envoyer des données
 			objectOutput = new ObjectOutputStream(mySocket.getOutputStream());
 			
-			// Tell the server we want to register
+			// Informer le serveur de notre volonté de s'enregistrer
 			objectOutput.writeObject(new String("registration"));
 			objectOutput.flush();
 			
-			// Send arraylist of client's ip and files to server
+			// Envoi de l'adresse ip et des fichiers partagés
 			objectOutput.writeObject(data);
 			objectOutput.flush();
 			
+			// retourne vrai si enregistrement ok
 			return true;
 		}catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -241,16 +242,18 @@ public class ClientModel extends Observable{
 			System.out.println("server connection error, dying.....");
 		}
 
+		// erreur d'enregistrement
 		return false;
 	}
 	
+	// Récupérer la liste des clients et leurs fichiers
 	public ArrayList<Object> getClientFiles(){
 		try {
-			// Tell the server we want to get the clients list and their files
+			// Informer le serveur que nous voulons récupérer les clients et la liste des fichiers qu'ils partagent
 			objectOutput.writeObject(new String("getfiles"));
 			objectOutput.flush();
 			
-			// Get the clients list and their files
+			// Récupérer les infos voulues
 			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
 			clientsList = (ArrayList<Object>) objectInputStream.readObject();
 			return clientsList;
@@ -262,11 +265,12 @@ public class ClientModel extends Observable{
 			e.printStackTrace();
 		}
 		
+		// en cas d'erreur, retour objet null
 		return null;
 	}
 	
 	/*
-	 * Observable getters and setters methods
+	 * Méthodes getters et setters pour observable
 	 */
 	public int getCurrentProgress() {
 		return currentProgress;
@@ -286,6 +290,5 @@ public class ClientModel extends Observable{
 	
 	public String getFileName() {
 		return fileName;
-	}
-	
+	}	
 }

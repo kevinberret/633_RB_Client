@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Observable;
 
 public class ClientReceiver  extends Observable implements Runnable{
+	// propriétés de la classe
 	private Socket clientSocket;
 	private List<String> filesToReceive;
 	private ClientModel model;
@@ -28,8 +29,7 @@ public class ClientReceiver  extends Observable implements Runnable{
 	
 	@Override
 	public void run(){
-		System.out.println("Client receiver started");
-
+		// Objets nécessaires à la réception de fichiers
 		BufferedInputStream bis;
 		DataInputStream dis;
 		int filesCount;
@@ -40,12 +40,13 @@ public class ClientReceiver  extends Observable implements Runnable{
 		BufferedOutputStream bos;
 		
 		try {
-			// Instantiate objectoutputstream to send data
+			// Instantiation de objectoutputstream pour envoyer des données
 			ObjectOutputStream objectOutput = new ObjectOutputStream(clientSocket.getOutputStream());
 			
-			// Tell the server which file we want
+			// Informer le serveur des fichiers que nous voulons
 			objectOutput.writeObject(filesToReceive);
 			
+			// Récupérer les informations sur le nombre de fichiers
 			bis = new BufferedInputStream(clientSocket.getInputStream());
 			
 			dis = new DataInputStream(bis);
@@ -53,35 +54,40 @@ public class ClientReceiver  extends Observable implements Runnable{
 			filesCount = dis.readInt();
 			files = new File[filesCount];
 
+			// Récupération de tous les fichiers
 			for(int i = 0; i < filesCount; i++)
 			{
+				// Récupération de la taille du fichier en cours et de son nom
 			    fileLength = dis.readLong();
 			    fileName = dis.readUTF();
 				float percentCurrentComplete;
 
+				// Reset de la progression de transfert de fichier et du nom du fichier en cours
 			    model.setCurrentProgress(0);
 			    model.setFileName(fileName);
 			    
+			    // Création d'un nouveau fichier
 			    files[i] = new File(fileName);
 
 			    fos = new FileOutputStream(files[i]);
 			    bos = new BufferedOutputStream(fos);
 			    
 			    for(int j = 0; j < fileLength; j++){
-			    	// Read data from input stream from socket
+			    	// Lecture de la portion de fichier
 			    	bos.write(bis.read());
 			    	
-			    	// Calculate percentage and display it
+			    	// Calcul du pourcentage de transfert et modification dans le modèle pour la gui
 			    	percentCurrentComplete = (float) ((j * 1.0) / fileLength * 100);
 			    	model.setCurrentProgress((int) percentCurrentComplete);
 			    }
 			    
-			    // force display 100% if transfer is finished [sometimes casting to in leads to a 99%)
+			    // Forcer l'affichage du 100% si les arrondis restent bloqués à 99%
 			    model.setCurrentProgress(100);
 
+			    // fermeture des objets pour la réception
 			    bos.close();
 			}
-
+		    // fermeture des objets pour la réception
 			dis.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
