@@ -51,4 +51,9 @@ public class Client implements Serializable {
 	public void setFiles(ArrayList<String> files) {
 		this.files = files;
 	}
+	
+	@Override
+	public String toString() {
+		return getClientIp();
+	}
 }

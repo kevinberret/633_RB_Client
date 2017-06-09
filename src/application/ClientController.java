@@ -123,16 +123,18 @@ public class ClientController {
 	}
 
 	public void closeConnections() {
-		try {
-			// close connection with clients
+		try {			
+			// Fermeture de la connexion avec les clients
 			if(clientReceiver != null && clientReceiver.getClientSocket() != null)
 				clientReceiver.getClientSocket().close();
 			if(clientListener != null && clientListener.getListenSocket() != null)
 				clientListener.getListenSocket().close();
 			
-			// close connection with main server
-			if(cm != null && cm.getMySocket() != null)
+			// Fermeture de la connexion avec le serveur
+			if(cm != null && cm.getMySocket() != null){
+				cm.disconnectFromServer();
 				cm.getMySocket().close();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -243,7 +243,7 @@ public class ClientWindow extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			// Get all the clients
 			clientsList = controller.getClientsList();
-			
+			System.out.println("ok");
 			// Create the model for the jlist
 //			DefaultListModel<String> model;
 			Vector model;
@@ -269,7 +269,7 @@ public class ClientWindow extends JFrame{
 			
 			// Ajout des clients au modele (tous les autres que nous)
 			for (String key : clientsList.keySet())
-			{
+			{			    
 			    if(!key.equals(controller.getThisClient().getUuid())){
 			    	Client tmpClient = clientsList.get(key);
 			    	model.addElement(new Element(tmpClient.getUuid(), tmpClient.getClientIp()));
@@ -298,12 +298,13 @@ public class ClientWindow extends JFrame{
 	 			
 	    		// Get the jlist from which the command came
 				JList source = (JList)e.getSource();
-		        Element elmt = (Element)source.getSelectedValue();
-		        
+		        Element elmt = (Element)source.getSelectedValue();		        
 				
 //				ArrayList<String> client = (ArrayList<String>)clientsList.get(source.getSelectedIndex());
 				Client client = controller.getClientByUuid(elmt.getUuid());
 				clientAsServerIP = client.getClientIp();
+				
+				System.out.println(client.getClientIp() + " - " + client.getUuid());
 				
 				DefaultListModel<String> model;
 				
@@ -327,9 +328,10 @@ public class ClientWindow extends JFrame{
 				
 				// Begin at index 1 to get only files and not ip address
 				ArrayList<String> files = client.getFiles();
-				for (int i = 1; i < files.size(); i++) {
-				    model.addElement(files.get(i));
-				}				
+				for (String file : files) {
+					System.out.println(file);
+				    model.addElement(file);
+				}			
 				
 				revalidate();
 	         }
@@ -348,14 +350,22 @@ public class ClientWindow extends JFrame{
 		public String getUuid() {
 			return uuid;
 		}
+		
 		public void setUuid(String uuid) {
 			this.uuid = uuid;
 		}
+		
 		public String getIp() {
 			return ip;
 		}
+		
 		public void setIp(String ip) {
 			this.ip = ip;
-		}		
+		}
+		
+		@Override
+		public String toString() {
+			return getIp();
+		}
 	}
 }

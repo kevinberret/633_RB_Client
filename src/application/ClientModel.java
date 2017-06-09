@@ -309,6 +309,20 @@ public class ClientModel extends Observable{
 		return null;
 	}
 	
+	// Se déconnecter du server
+	public void disconnectFromServer(){
+		try {
+			// Informer le serveur que nous voulons récupérer un client et envoi du uuid du client désiré
+			objectOutput.writeObject(new String("quit"));
+			objectOutput.flush();
+			
+			objectOutput.writeObject(uuid);
+			objectOutput.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/*
 	 * Méthodes getters et setters pour observable
 	 */
