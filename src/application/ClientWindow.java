@@ -245,7 +245,6 @@ public class ClientWindow extends JFrame{
 			clientsList = controller.getClientsList();
 			System.out.println("ok");
 			// Create the model for the jlist
-//			DefaultListModel<String> model;
 			Vector model;
 			
 			// Create the jlist or modify its model
@@ -277,12 +276,6 @@ public class ClientWindow extends JFrame{
 			    
 			}
 			
-			/*for(int i = 0 ; i < clientsList.size()  ; i++){
-				String client = ((ArrayList<String>)clientsList.get(i)).get(0);
-				if(!client.equals(controller.getClientName()))
-					model.addElement(client);
-			}*/
-			
 			revalidate();
 			
 			if(!pnlBottom.isVisible())
@@ -300,7 +293,6 @@ public class ClientWindow extends JFrame{
 				JList source = (JList)e.getSource();
 		        Element elmt = (Element)source.getSelectedValue();		        
 				
-//				ArrayList<String> client = (ArrayList<String>)clientsList.get(source.getSelectedIndex());
 				Client client = controller.getClientByUuid(elmt.getUuid());
 				clientAsServerIP = client.getClientIp();
 				
