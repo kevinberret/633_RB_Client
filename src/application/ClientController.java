@@ -1,7 +1,6 @@
 package application;
 
 import java.io.IOException;
-import java.net.NetworkInterface;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
