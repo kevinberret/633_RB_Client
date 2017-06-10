@@ -5,6 +5,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.io.File;
 import java.util.ArrayList;
@@ -32,40 +33,126 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.sun.glass.events.KeyEvent;
-
+/**
+ * This class is the main view of our application.
+ * @author Kevin
+ *
+ */
 public class ClientWindow extends JFrame{
-	// Eléments GUI
+	/**
+	 * This file chooser is used when you have to choose which folder you want to share
+	 */
 	private JFileChooser jfcChoose;
+	
+	/**
+	 * Top menu bar
+	 */
 	private JMenuBar jmbMenuBar;
+	
+	/**
+	 * File menu
+	 */
 	private JMenu jmFile;
+	
+	/**
+	 * Edit menu
+	 */
 	private JMenu jmEdit;
+	
+	/**
+	 * Share files menu item
+	 */
 	private JMenuItem jmiShareFiles;
+	
+	/**
+	 * Get clients menu item
+	 */
 	private JMenuItem jmiGetClients;
+	
+	/**
+	 * Settings menu item
+	 */
 	private JMenuItem jmiSettings;
-	private JButton btnGetFiles;
+	
+	/**
+	 * Download files button
+	 */
+	private JButton btnDownloadFiles;
+	
+	/**
+	 * List of all clients
+	 */
 	private JList<String> jlClients;
+	
+	/**
+	 * Model for list of all clients
+	 */
 	private Vector<Element> clientsListModel;
+	
+	/**
+	 * Scroller if a lot a clients are available
+	 */
 	private JScrollPane listClientsScroller;
+	
+	/**
+	 * List of available files
+	 */
 	private JList<String> jlFiles;
+	
+	/**
+	 * Model for list of available files
+	 */
 	private DefaultListModel<String> filesModel;
+	
+	/**
+	 * Combobox with network interfaces
+	 */
 	private JComboBox<String> jcbNetworkInterfaces;
+	
+	/**
+	 * Validation of network interface
+	 */
 	private JButton btnValidate;
+	
+	/**
+	 * Progressbar when download files
+	 */
 	private ClientProgressBar jpbCurrentProgress;
 	
-	// Eléments de l'application
+	/**
+	 * IP when client is used as server
+	 */
 	private String clientAsServerIP;
-	private ArrayList<String> clients;
-	private LinkedHashMap<String, Client> clientsList;	
+	
+	/**
+	 * All clients list
+	 */
+	private LinkedHashMap<String, Client> clientsList;
+	
+	/**
+	 * Controller that makes the link between view and model
+	 */
 	private ClientController controller;
+	
+	/**
+	 * Panel used for progessbar, clientfilename and download button 
+	 */
 	private JPanel pnlBottom;
+	
+	/**
+	 * Model that contains data used for observers
+	 */
 	private ClientModel model;
-		
+	
+	
+	/**
+	 * This method allows to generate the GUI
+	 */
 	private void generateGUI(){
-		// ne ferme pas l'application quand la fenêtre est fermée	
+		// application doesn't terminate on jframe close
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
-		// Récupération du style d'affichage de l'os sur lequel le client est exécuté
+		// Get default's os display style
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException e) {
@@ -78,11 +165,11 @@ public class ClientWindow extends JFrame{
 			e.printStackTrace();
 		}
 		
-		// Taille et titre
+		// set properties
 		setPreferredSize(new Dimension(1024,768));
 		setTitle("Client p2p");
 		
-		// Création du menubar, des éléments du menu et assignation de tâches et raccourcis clavier
+		// create menubar, menu, menuitems and mnemonics
 		jmbMenuBar = new JMenuBar();
 		jmFile = new JMenu("File");
 		jmiShareFiles = new JMenuItem("Share", KeyEvent.VK_O);
@@ -104,7 +191,7 @@ public class ClientWindow extends JFrame{
 		jmbMenuBar.add(jmEdit);
 		setJMenuBar(jmbMenuBar);		
 		
-		// Sélection de l'adresse ip
+		// ip address selection panel
 		JPanel pnlTop = new JPanel(new BorderLayout());
 		pnlTop.setBorder(new EmptyBorder(10, 10, 10, 10));
 		JLabel lblIPAddress = new JLabel("Select your network interface...");		
@@ -112,56 +199,80 @@ public class ClientWindow extends JFrame{
 		btnValidate = new JButton("Validate");
 		btnValidate.addActionListener(new ChooseIPAction());
 		
-		// Ajout des éléments au panel du sommet
+		// add alements to top panel
 		pnlTop.add(lblIPAddress, BorderLayout.WEST);
 		pnlTop.add(jcbNetworkInterfaces, BorderLayout.CENTER);
 		pnlTop.add(btnValidate, BorderLayout.EAST);
 		
+		// add all addresses to combobox
 		for (String netint : controller.getNetworkInterfaces()) {
 			jcbNetworkInterfaces.addItem(netint);
 		}
 		
-		// Création des barres de progression
+		// create progress bars
 		jpbCurrentProgress = new ClientProgressBar(model);
 		JPanel pnlCurrent = new JPanel();
 		JLabel lblCurrentProgress = new ClientFileName(model);
 		pnlCurrent.add(lblCurrentProgress, BorderLayout.WEST);
 		pnlCurrent.add(jpbCurrentProgress, BorderLayout.SOUTH);		
 		
-		// Ajout du bouton pour récupérer les fichiers depuis l'autre client
-		btnGetFiles = new JButton("Get files");
-		btnGetFiles.addActionListener(new GetFiles());
-		btnGetFiles.setEnabled(false);
+		// add button to download files
+		btnDownloadFiles = new JButton("Download files");
+		btnDownloadFiles.addActionListener(new GetFiles());
+		btnDownloadFiles.setEnabled(false);
 		pnlBottom = new JPanel();
-		pnlBottom.add(btnGetFiles, BorderLayout.WEST);
+		pnlBottom.add(btnDownloadFiles, BorderLayout.WEST);
 		pnlBottom.add(pnlCurrent, BorderLayout.SOUTH);
 		pnlBottom.setVisible(false);
 		
-		// Ajout des éléments à la frame
+		// add all panels to frame
 		add(pnlTop, BorderLayout.NORTH);
 		add(pnlBottom, BorderLayout.SOUTH);
 				
-		// Ajout d'un listener sur la fermeture de la fenêtre (permet de gérer la déconnexion)
+		// add listener to closing window (to ask question do you really want to quit?)
 		addWindowListener(new CloseWindow(this, controller));
 		
 		pack();
 	}	
 	
+	/**
+	 * Default constructor
+	 * @param controller The controller
+	 * @param model The model
+	 */
 	public ClientWindow(ClientController controller, ClientModel model) {		
 		this.controller = controller;
 		this.model = model;
 		
-		// Generation de la gui
+		// GUI generation
 		generateGUI();
 	}
 	
-	public void showErrorDialog(String title, String error, int type){
-		JOptionPane.showMessageDialog(this, error, title, type);
+	/**
+	 * This method allows to display a dialog with questions or not
+	 * @param title The dialog title
+	 * @param message The  message
+	 * @param type The message type
+	 */
+	public void showErrorDialog(String title, String message, int type){
+		JOptionPane.showMessageDialog(this, message, title, type);
 	}
 	
+	/**
+	 * This inner class allows to open the settings modal when called
+	 * @author Kevin
+	 *
+	 */
 	private class SettingsAction implements ActionListener{
+		/**
+		 * The frame to which the dialog will be attached
+		 */
 		private JFrame frame;		
 		
+		/**
+		 * Default constructor
+		 * @param frame The frame to which the dialog will be attached
+		 */
 		public SettingsAction(JFrame frame) {
 			this.frame = frame;
 			
@@ -169,56 +280,84 @@ public class ClientWindow extends JFrame{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			// Open the dialog
 			Dialog modal = new ClientSettings(frame, "Settings", true, controller);
 			modal.setVisible(true);
 		}		
 	}
 	
+	/**
+	 * This inner class allows to deal with closing window
+	 * @author Kevin
+	 *
+	 */
 	private class CloseWindow extends WindowAdapter{
+		/**
+		 * The frame to which the dialog will be attached
+		 */
 		private JFrame frame;
-		private ClientController cc;
 		
-		public CloseWindow(JFrame frame, ClientController cc) {
+		/**
+		 * The controller that links our view and model
+		 */
+		private ClientController controller;
+		
+		/**
+		 * Default constructor
+		 * @param frame The frame to which the dialog will be attached
+		 * @param controller The controller that links our view and model
+		 */
+		public CloseWindow(JFrame frame, ClientController controller) {
 			this.frame = frame;
-			this.cc = cc;
+			this.controller = controller;
 		}
 		
 		@Override
 	    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
 	        if (JOptionPane.showConfirmDialog(frame, "Are you sure you want to close this window?", "Close the window", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
-	        	// fermeture des sockets
-	            cc.closeConnections();
+	        	// close sockets
+	            controller.closeConnections();
 	        	
-	            // fermeture de l'application
+	            // terminate application
 	            setDefaultCloseOperation(EXIT_ON_CLOSE);
 	        }
 	    }
 	}
 	
+	/**
+	 * This inner class allows to handle IP choice
+	 * @author Kevin
+	 *
+	 */
 	private class ChooseIPAction implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// Définition de l'adresse ip choisie par l'utilisateur
+			// Set chosen ip address
 			controller.setClientIp(jcbNetworkInterfaces.getSelectedItem().toString());
 			
-			// Modification de l'interface graphique
+			// Modify gui
 			btnValidate.setEnabled(false);
 			jcbNetworkInterfaces.setEnabled(false);
 			jmiShareFiles.setEnabled(true);
 		}		
 	}
 
+	/**
+	 * This inner class allows to choose the folder to share
+	 * @author Kevin
+	 *
+	 */
 	private class ShareFilesAction implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// Generation jfilechooser
+			// Generate jfilechooser
 			jfcChoose = new JFileChooser(); 
 			jfcChoose.setCurrentDirectory(new File("files"));
 			jfcChoose.setDialogTitle("Choose a folder to share");
 			jfcChoose.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			jfcChoose.setAcceptAllFileFilterUsed(false);
 			
-			// Récupération du dossier désiré et des fichiers
+			// Get the desired folder and set it in controller. display an error message if impossible to share the folder
 			String selectedFolder;			
 		    if (jfcChoose.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 		    	selectedFolder = jfcChoose.getSelectedFile().toString();
@@ -230,6 +369,11 @@ public class ClientWindow extends JFrame{
 		}		
 	}
 	
+	/**
+	 * This inner class allows to download the chosen files
+	 * @author Kevin
+	 *
+	 */
 	private class GetFiles implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -238,14 +382,19 @@ public class ClientWindow extends JFrame{
 		}		
 	}
 	
+	/**
+	 * This inner class allows to get the clients list
+	 * @author Kevin
+	 *
+	 */
 	private class GetClientAction implements ActionListener{		
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// Récupération de tous les clients
+			// Get all clients
 			clientsList = controller.getClientsList();
 			
-			// Créée la liste ou la modifie si déjà existante et désélectionne tout
+			// Creates the list or modify it
 			if(jlClients != null){
 				clientsListModel.clear();
 				filesModel.clear();
@@ -266,42 +415,46 @@ public class ClientWindow extends JFrame{
 				add(listClientsScroller, BorderLayout.WEST);
 			}
 			
-			// Ajout des clients au modele (tous les autres que nous)
+			// Add clients to the model (all except us)
 			for (String key : clientsList.keySet())
 			{			    
-			    if(!key.equals(controller.getThisClient().getUuid())){
-			    	Client tmpClient = clientsList.get(key);
-			    	clientsListModel.addElement(new Element(tmpClient.getUuid(), tmpClient.getClientIp()));
-			    }			    
+			    Client tmpClient = clientsList.get(key);
+		    	clientsListModel.addElement(new Element(tmpClient.getUuid(), tmpClient.getClientIp()));			    
 			}
 			
 			revalidate();
 			
+			// make visible the panel to download files
 			if(!pnlBottom.isVisible())
 				pnlBottom.setVisible(true);
 		}	
 	}
 	
+	/**
+	 * This class allows to select a client and get his files
+	 * @author Kevin
+	 *
+	 */
 	private class SelectClient implements ListSelectionListener {
 		private JScrollPane listFilesScroller;		
 		
 	    public void valueChanged(ListSelectionEvent e) {
 	    	 if (e.getValueIsAdjusting()){
 	 			
-	    		// Récupérer la jlist source
+	    		// Get the source list
 				JList source = (JList)e.getSource();
 		        Element elmt = (Element)source.getSelectedValue();		        
 				
 				Client client = controller.getClientByUuid(elmt.getUuid());
 				clientAsServerIP = client.getClientIp();
 				
-				// Création de la jlist ou modification
+				// Create or modify the list
 				if(jlFiles != null){
 					filesModel.clear();
 				}else{
 					filesModel = new DefaultListModel<String>();
 					jlFiles = new JList(filesModel);				
-					btnGetFiles.setEnabled(true);
+					btnDownloadFiles.setEnabled(true);
 		 			
 					jlFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 					jlFiles.setLayoutOrientation(JList.VERTICAL);
@@ -312,7 +465,7 @@ public class ClientWindow extends JFrame{
 					add(listFilesScroller, BorderLayout.CENTER);
 				}
 				
-				// Ajout de tous les fichiers dans le model pour afficher sur la liste des fichiers à disposition
+				// Add all files to the list's model
 				ArrayList<String> files = client.getFiles();
 				for (String file : files) {
 				    filesModel.addElement(file);
@@ -323,27 +476,60 @@ public class ClientWindow extends JFrame{
 	    }
 	}
 	
+	/**
+	 * This class allows to display the ip address of clients and bind it with the correct client's uuid
+	 * @author student
+	 *
+	 */
 	private class Element{
+		/**
+		 * client's uuid
+		 */
 		private String uuid;
+		
+		/**
+		 * client's ip address
+		 */
 		private String ip;
 		
+		/**
+		 * default constructor
+		 * @param uuid the client's unique id
+		 * @param ip the client's ip address
+		 */
 		public Element(String uuid, String ip){
 			this.uuid = uuid;
 			this.ip = ip;
 		}
 		
+		/**
+		 * Get client's uuid
+		 * @return client's uuid
+		 */
 		public String getUuid() {
 			return uuid;
 		}
 		
+		/**
+		 * Sets client's uuid
+		 * @param uuid The client's uuid
+		 */
 		public void setUuid(String uuid) {
 			this.uuid = uuid;
 		}
 		
+		/**
+		 * Get client's ip address
+		 * @return client's ip address
+		 */
 		public String getIp() {
 			return ip;
 		}
 		
+		/**
+		 * Sets the client's ip address
+		 * @param ip The client's ip address
+		 */
 		public void setIp(String ip) {
 			this.ip = ip;
 		}

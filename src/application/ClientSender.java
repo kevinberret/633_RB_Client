@@ -10,20 +10,35 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * This class allows a client to send files to another client
+ * @author Daniel et Kevin
+ *
+ */
 public class ClientSender implements Runnable {
-	// propriétés de la classe
+	/**
+	 * The socket used in connection with another client
+	 */
 	private Socket clientSocket;
+	
+	/**
+	 * The folder where shared files are stored in
+	 */
 	private String folder;
 	
+	/**
+	 * Default constructor
+	 * @param clientSocket The socket used in connection with another client
+	 * @param folder The folder where shared files are stored in
+	 */
 	public ClientSender(Socket clientSocket, String folder) {
 		this.clientSocket = clientSocket;
 		this.folder = folder;
-	}
-	
+	}	
 	
 	@Override
 	public void run() {
-		// Création des objets nécessaires pour la transaction
+		// Create des objects for transaction
 		ObjectInputStream objectInputStream;
 		ArrayList<String> filesList;
 		BufferedOutputStream bos;
@@ -32,45 +47,40 @@ public class ClientSender implements Runnable {
 		FileInputStream fis;
 		
 		try {
-			// Récupération de la liste de fichiers à envoyer
+			// Get files list
 			objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
 			filesList = (ArrayList<String>) objectInputStream.readObject();
 			
-			// Création des objets nécessaires pour l'envoi de fichiers
+			// Create objects used to send data
 			bos = new BufferedOutputStream(clientSocket.getOutputStream());
 			dos = new DataOutputStream(bos);
-			
-			// Envoi du nombre de fichiers qui seront envoyés
-			dos.writeInt(filesList.size());
-			
-			// Le fichier à envoyer
 			File fileToSend;
 
 			for(String file : filesList)
 			{
-				// Création du fichier 
+				// Create the file 
 				fileToSend = new File(folder+"\\"+file);
 				
-				// Envoi de sa taille et de son nom
+				// Send his size and name
 			    long length = fileToSend.length();
 			    dos.writeLong(length);
-
 			    String name = fileToSend.getName();
 			    dos.writeUTF(name);
 
-			    // Création des objets nécessaires pour l'envoi des fichiers en bytes
+			    // Create objects to send file
 			    fis = new FileInputStream(folder+"\\"+file);
 			    bis = new BufferedInputStream(fis);
 
-			    // Envoi du fichier
+			    // Sending file
 			    int theByte = 0;
 			    while((theByte = bis.read()) != -1) 
 			    	bos.write(theByte);
 
+			    // Close objects
 			    bis.close();
 			}
 
-			// Fermeture de l'objet pour envoyer les fichiers
+			// Close objects
 			dos.close();
 		} catch (IOException e) {
 			e.printStackTrace();

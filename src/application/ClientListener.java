@@ -2,19 +2,40 @@ package application;
 
 import java.net.ServerSocket;
 
+/**
+ * This class is used to listen to client and open connections with clients that want files that we share
+ * @author Daniel
+ *
+ */
 public class ClientListener implements Runnable {
-	// propriétés de la classe
+	/**
+	 * The server socket that will transform our client as a server
+	 */
 	private ServerSocket listenSocket = null;
+	
+	/**
+	 * The port listened by server socket
+	 */
 	private int clientAsServerPort;
+	
+	/**
+	 * The folder shared by the client
+	 */
 	private String folder;
 	
+	/**
+	 * Default constructor
+	 * @param clientAsServerPort The port on which the client will listen
+	 * @param folder The folder to share
+	 */
 	public ClientListener(int clientAsServerPort, String folder) {
 		this.clientAsServerPort = clientAsServerPort;
 		this.folder = folder;
 	}	
 	
-	/*
-	 * GETTERS
+	/**
+	 * Returns the listening socket
+	 * @return The socket
 	 */
 	public ServerSocket getListenSocket() {
 		return listenSocket;
@@ -23,11 +44,11 @@ public class ClientListener implements Runnable {
 	@Override
 	public void run() {
 		try {
-			// Démarrage du socket en tant que serveur
+			// Instantiate the serversocket
 			listenSocket = new ServerSocket(clientAsServerPort);
 
 			while(true){
-				// Ouverture de socket avec un client et démarrage de l'envoi dans un thread
+				// Opening a socket with a client and begin a thread for their file exchange
 				ClientSender cs = new ClientSender(listenSocket.accept(), folder);
 				
 				Thread t = new Thread(cs);

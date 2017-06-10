@@ -21,26 +21,122 @@ import java.util.Observable;
 import java.util.Properties;
 import java.util.UUID;
 
+/**
+ * This class contains all data values
+ * @author Kevin
+ *
+ */
 public class ClientModel extends Observable{
-	// propriétés de la classe
+	
+	/**
+	 * client's uuid
+	 */
 	private String uuid;
-	private String serverName;
+	
+	/**
+	 * server's ip address
+	 */
+	private String serverIP;
+	
+	/**
+	 * default server's ip address
+	 */
+	private String defaultServerIP = new String("192.168.108.10");
+	
+	/**
+	 * client's ip address
+	 */
 	private String clientIp;
+	
+	/**
+	 * server's port
+	 */
 	private int serverPort;
+	
+	/**
+	 * default server's port
+	 */
+	private int defaultServerPort = 45006;
+	
+	/**
+	 * port used by the client when it has to send files
+	 */
 	private int clientAsServerPort;
+	
+	/**
+	 * default port used by the client when it has to send files
+	 */
+	private int defaultClientAsServerPort = 5600;
+	
+	/**
+	 * the files shared list
+	 */
 	private ArrayList<String> filesList;
+	
+	/**
+	 * the files shared array
+	 */
 	private File[] files;
+	
+	/**
+	 * server's ip address
+	 */
 	private InetAddress serverAddress;
+	
+	/**
+	 * socket for connection with server
+	 */
 	private Socket mySocket;
+	
+	/**
+	 * used to send objects through socket
+	 */
 	private ObjectOutputStream objectOutput;
+	
+	/**
+	 * folder shared
+	 */
 	private String folder;
+	
+	/**
+	 * timeout for connection with server
+	 */
 	private int clientTimeOut;
+	
+	/**
+	 * default timeout for connection with server
+	 */
+	private int defaultClientTimeOut = 5000;
+	
+	/**
+	 * network interfaces
+	 */
 	private ArrayList<String> networks;
-	private Properties properties;	
+	
+	/**
+	 * settings
+	 */
+	private Properties properties;
+	
+	/**
+	 * current download progress
+	 */
 	private int currentProgress;
+	
+	/**
+	 * current downloaded filename
+	 */
 	private String fileName;
+	
+	/**
+	 * this client
+	 */
 	private Client thisClient;
 	
+	
+	/**
+	 * Default constructor
+	 */
 	public ClientModel() {
 		// Get application settings
 		getResources();		
@@ -52,17 +148,27 @@ public class ClientModel extends Observable{
 		thisClient = new Client(uuid);
 	}
 	
-	/*
-	 * GETTERS
+	/**
+	 * get client's ip address
+	 * @return client's ip address
 	 */
-	public String getClientName() {
+	public String getClientIP() {
 		return clientIp;
 	}	
 	
+	/**
+	 * get client's uuid
+	 * @return client's uuid
+	 */
 	public String getUuid() {
 		return uuid;
 	}
 
+	
+	/**
+	 * get port used by client when sends files
+	 * @return port used by client when sends files
+	 */
 	public int getClientAsServerPort() {
 		return clientAsServerPort;
 	}
@@ -75,8 +181,8 @@ public class ClientModel extends Observable{
 		return folder;
 	}
 	
-	public String getServerName() {
-		return serverName;
+	public String getServerIP() {
+		return serverIP;
 	}
 	
 	public int getServerPort() {
@@ -99,14 +205,14 @@ public class ClientModel extends Observable{
 	 * SETTERS
 	 */
 
-	public void setClientName(String ip) {
+	public void setClientIP(String ip) {
 		clientIp = ip;
 		thisClient.setClientIp(ip);
 	}	
 
-	public void setServerName(String serverName) {
+	public void setServerIP(String serverName) {
 		properties.setProperty("server.ip", serverName);
-		this.serverName = serverName;
+		this.serverIP = serverName;
 	}	
 
 	public void setServerPort(int serverPort) {
@@ -124,12 +230,11 @@ public class ClientModel extends Observable{
 		this.clientAsServerPort = clientAsServerPort;
 	}
 
-	/*
-	 * APPLICATION CORE
-	 */	
+	/**
+	 * This method get settings from config file
+	 */
 	private void getResources(){
-		// source : http://www.codejava.net/coding/reading-and-writing-configuration-for-java-application-using-properties-class#CreateProperties
-		// Récupération des paramètres enregistrés
+		// source : http://www.codejava.net/coding/reading-and-writing-configuration-for-java-application-using-properties-class#CreatePropertie
 		File configFile;		 
 		FileReader fr;
 		properties = new Properties();
@@ -138,7 +243,7 @@ public class ClientModel extends Observable{
 			configFile = new File("config.properties");
 			fr = new FileReader(configFile);			
 			
-			// Chargement des paramètres depuis le fichier
+			// load settings from file
 			properties.load(fr);
 			
 			fr.close();
@@ -148,16 +253,16 @@ public class ClientModel extends Observable{
 			e.printStackTrace();
 		}
 		
-		// Définition des paramètres de l'application
-		serverName = properties.getProperty("server.ip");
-		serverPort = Integer.parseInt(properties.getProperty("server.port"));
-		clientTimeOut = Integer.parseInt(properties.getProperty("client.timeout"));
-		clientAsServerPort = Integer.parseInt(properties.getProperty("client.asserver.port"));
+		// Set application settings
+		serverIP = properties.getProperty("server.ip", defaultServerIP);
+		serverPort = Integer.parseInt(properties.getProperty("server.port", String.valueOf(defaultServerPort)));
+		clientTimeOut = Integer.parseInt(properties.getProperty("client.timeout", String.valueOf(defaultClientTimeOut)));
+		clientAsServerPort = Integer.parseInt(properties.getProperty("client.asserver.port", String.valueOf(defaultClientAsServerPort)));
 		
-		// Récupération de l'id unique du client
+		// Get client's uuid
 		uuid = properties.getProperty("client.uuid");
 		
-		// Si le client ne possède pas d'id unique, génération d'un nouveau et sauvegarde dans le fichier config
+		// if no uuid, generate one and save it into config
 		if(uuid == null){
 			uuid = UUID.randomUUID().toString();
 			properties.setProperty("client.uuid", uuid);
@@ -165,13 +270,16 @@ public class ClientModel extends Observable{
 		}
 	}
 	
-	// Sauvegarde des paramètres
+	/**
+	 * This method saves settings into config.properties
+	 * @return true if save ok, false if not
+	 */
 	public boolean saveSettings(){
-		// Création du fichier dans lequel seront enregistrées les données
+		// create config file
 		File configFile = new File("config.properties");		
 		FileWriter fw;
 		
-		// Sauvegarde des données
+		// write data in file
 		try {
 			fw = new FileWriter(configFile);
 			properties.store(fw, "application settings");
@@ -181,11 +289,14 @@ public class ClientModel extends Observable{
 			e.printStackTrace();
 		}
 		
-		// Retourne faux en cas d'erreur d'enregistrement
+		// errors
 		return false;
 	}
 	
-	// Récupération de la liste des ip pour le client
+	/**
+	 * Get all network interfaces to let the user choose his interface
+	 * @return an arraylist of string of all interfaces
+	 */
 	public ArrayList<String> getNetworkInterfaces(){
 		// source : https://docs.oracle.com/javase/tutorial/networking/nifs/listing.html
 		if(networks == null){
@@ -209,7 +320,11 @@ public class ClientModel extends Observable{
 		return networks;
 	}
 	
-	// Vérification que le dossier sélectionné contient bien des fichiers à partager.
+	/**
+	 * Set the selected folder
+	 * @param selectedFolder The chosen folder to set
+	 * @return true if contains files, false if not
+	 */
 	public boolean selectFolder(String selectedFolder){
 		folder = selectedFolder;
     	files = new File(selectedFolder).listFiles();
@@ -220,41 +335,38 @@ public class ClientModel extends Observable{
     	return false;
 	}
 	
-	// Connexion au serveur
+	/**
+	 * This method connects the client to the server
+	 * @return true if connection worked, false if not
+	 */
 	public boolean connectToServer(){		
 		try {			
-			serverAddress = InetAddress.getByName(serverName);
+			serverAddress = InetAddress.getByName(serverIP);
 
-			// Tentative de connexion au serveur
+			// Try to connect to server
 			mySocket = new Socket();
 			mySocket.connect(new InetSocketAddress(serverAddress, serverPort), clientTimeOut);
 			
-			// Création d'une arraylist de string qui contient les adresses ip des clients et leurs fichiers
+			// set client files list
 			filesList = new ArrayList<String>();
-			
-			// Ajout de l'ip du client
-			//data.add(clientIp);
-			
-			// Ajout des fichiers du client
 			for (File file : files) {
 				if(!file.isDirectory())
 					filesList.add(file.getName());
-			}
-			
+			}			
 			thisClient.setFiles(filesList);
 			
-			// Objectoutputstream pour envoyer des données
+			// Objectoutputstream to send data through socket
 			objectOutput = new ObjectOutputStream(mySocket.getOutputStream());
 			
-			// Informer le serveur de notre volonté de s'enregistrer
+			// tell the server we want to register
 			objectOutput.writeObject(new String("registration"));
 			objectOutput.flush();
 			
-			// Envoi de l'adresse ip et des fichiers partagés
+			// send this client representation
 			objectOutput.writeObject(thisClient);
 			objectOutput.flush();
 			
-			// retourne vrai si enregistrement ok
+			// connection established
 			return true;
 		}catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -262,18 +374,21 @@ public class ClientModel extends Observable{
 			System.out.println("server connection error, dying.....");
 		}
 
-		// erreur d'enregistrement
+		// error
 		return false;
 	}
 	
-	// Récupérer la liste des clients et leurs fichiers
+	/**
+	 * This method get the clients
+	 * @return a linkedhashmap of all clients
+	 */
 	public LinkedHashMap<String, Client> getClientFiles(){
 		try {
-			// Informer le serveur que nous voulons récupérer les clients et la liste des fichiers qu'ils partagent
+			// Tell the server we want to get all clients and their files
 			objectOutput.writeObject(new String("getfiles"));
 			objectOutput.flush();
 			
-			// Récupérer les infos voulues
+			// get the linkedhashmap from server
 			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
 			return (LinkedHashMap<String, Client>) objectInputStream.readObject();
 		} catch (IOException e) {
@@ -282,21 +397,25 @@ public class ClientModel extends Observable{
 			e.printStackTrace();
 		}
 		
-		// en cas d'erreur, retour objet null
+		// errors
 		return null;
 	}
 	
-	// Récupérer un client par son unique id
+	/**
+	 * Get a client by his uuid
+	 * @param uuid The client's uuid
+	 * @return The client
+	 */
 	public Client getClientByUuid(String uuid){
 		try {
-			// Informer le serveur que nous voulons récupérer un client et envoi du uuid du client désiré
+			// tell the server we want a specific client by uuid and send the uuid
 			objectOutput.writeObject(new String("getclientbyuuid"));
 			objectOutput.flush();
 			
 			objectOutput.writeObject(uuid);
 			objectOutput.flush();
 			
-			// Récupérer les infos voulues
+			// get the client
 			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
 			return (Client) objectInputStream.readObject();
 		} catch (IOException e) {
@@ -305,14 +424,16 @@ public class ClientModel extends Observable{
 			e.printStackTrace();
 		}
 		
-		// en cas d'erreur, retour objet null
+		// error
 		return null;
 	}
 	
-	// Se déconnecter du server
+	/**
+	 * This method allows to disconnect from server
+	 */
 	public void disconnectFromServer(){
 		try {
-			// Informer le serveur que nous voulons récupérer un client et envoi du uuid du client désiré
+			// Tell the server we want to quit the connection
 			objectOutput.writeObject(new String("quit"));
 			objectOutput.flush();
 			
@@ -323,25 +444,38 @@ public class ClientModel extends Observable{
 		}
 	}
 	
-	/*
-	 * Méthodes getters et setters pour observable
+	/**
+	 * This method allows to get the current download progress
+	 * @return the current download progress
 	 */
 	public int getCurrentProgress() {
 		return currentProgress;
 	}
 	
+	/**
+	 * This method allows to set the current download progress and notify observers of download progress modification
+	 * @param currentProgress The current progress
+	 */
 	public void setCurrentProgress(int currentProgress){
 		this.currentProgress = currentProgress;
 		setChanged();
 		notifyObservers();
 	}
 
+	/**
+	 * This method allows to set the current download filename and notify observers of downloaded filename
+	 * @param fileName The current filename
+	 */
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 		setChanged();
 		notifyObservers();
 	}
 	
+	/**
+	 * This method allows to get the current downloaded file name
+	 * @return the current downloaded file name
+	 */
 	public String getFileName() {
 		return fileName;
 	}	

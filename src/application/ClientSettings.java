@@ -10,8 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,41 +19,69 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 /**
- * @author kb
+ * This class represents a dialog that allows to set the settings for the application
+ * @author Kevin
  *
  */
 public class ClientSettings extends Dialog {
-	// propriétés de la classe
-	private ClientController cc;
-	private JTextField jtfServerName;
+	/**
+	 * The controller that allow to get and set settings
+	 */
+	private ClientController controller;
+	
+	/**
+	 * The textfield for server ip address
+	 */
+	private JTextField jtfServerIP;
+	
+	/**
+	 * The textfield for server port
+	 */
 	private JTextField jtfServerPort;
+	
+	/**
+	 * The textfield for timeout
+	 */
 	private JTextField jtfClientTimeOut;
+	
+	/** 
+	 * The textfield for port when client has to send files
+	 */
 	private JTextField jtfClientAsServerPort;
+	
+	/**
+	 * The main frame to which the dialog is related
+	 */
 	private ClientWindow frame;
 
-	public ClientSettings(JFrame frame, String title, boolean modal, ClientController cc) {
+	/**
+	 * Default constructor
+	 * @param frame The main frame to which the dialog is related
+	 * @param title the title of the dialog or null if this dialog has no title
+	 * @param modal specifies whether dialog blocks user input to other top-level windows when shown. If false, the dialog is MODELESS; if true, the modality type property is set to DEFAULT_MODALITY_TYPE
+	 * @param controler
+	 */
+	public ClientSettings(JFrame frame, String title, boolean modal, ClientController controler) {
 		super(frame, title, modal);
-		this.cc = cc;
+		this.controller = controler;
 		this.frame = (ClientWindow) frame;	
 		
-		// création de l'affichage
+		// generate gui
 		generateGUI();
-		
-		pack();
 	}
 	
 	private void generateGUI(){
-		// Génération de la gui
+		// Generate gui
 		JPanel pnlCenter = new JPanel();
 		pnlCenter.setBorder(new EmptyBorder(10, 10, 10, 10));
 		JLabel lblServerName = new JLabel("Server IP");
 		JLabel lblServerPort = new JLabel("Server port");
 		JLabel lblClientTimeOut = new JLabel("Time out");
 		JLabel lblClientAsServerPort = new JLabel("Port to share files");
-		jtfServerName = new JTextField(cc.getServerName());
-		jtfServerPort = new JTextField(cc.getServerPort());
-		jtfClientTimeOut = new JTextField(cc.getClientTimeOut());
-		jtfClientAsServerPort = new JTextField(cc.getClientAsServerPort());
+		jtfServerIP = new JTextField(controller.getServerIP());
+		jtfServerPort = new JTextField(controller.getServerPort());
+		jtfClientTimeOut = new JTextField(controller.getClientTimeOut());
+		jtfClientAsServerPort = new JTextField(controller.getClientAsServerPort());
 		
 		JPanel pnlBottom = new JPanel();
 		pnlBottom.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -66,7 +92,7 @@ public class ClientSettings extends Dialog {
 		
 		pnlCenter.setLayout(new GridLayout(4, 2));
 		pnlCenter.add(lblServerName);
-		pnlCenter.add(jtfServerName);
+		pnlCenter.add(jtfServerIP);
 		pnlCenter.add(lblServerPort);
 		pnlCenter.add(jtfServerPort);
 		pnlCenter.add(lblClientTimeOut);
@@ -78,31 +104,39 @@ public class ClientSettings extends Dialog {
 		add(pnlBottom, BorderLayout.SOUTH);
 		
 		addWindowListener(new CloseAction());
+		
+		pack();
 	}
 	
-	/*
-	 * EVENTS
+	/**
+	 * This inner class is used to modify the behaviour of the dialog when it's closed
+	 * @author Kevin
+	 *
 	 */
-	
 	class CloseAction extends WindowAdapter{
 		@Override
 		public void windowClosing(WindowEvent e) {
-			// à la fermeture de la fenêtre de settings, fermeture du dialog
+			// close dialog
 			dispose();
 		}		
 	}
 
+	/**
+	 * This inner class saves the settings entered by the user
+	 * @author Kevin
+	 *
+	 */
 	class SaveAction implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// Récupération des infos entrées et définition via le controller
-			cc.setClientAsServerPort(jtfClientAsServerPort.getText());
-			cc.setClientTimeOut(jtfClientTimeOut.getText());
-			cc.setServerName(jtfServerName.getText());
-			cc.setServerPort(jtfServerPort.getText());
+			// Get settings in inputs and set their values in controller
+			controller.setClientAsServerPort(jtfClientAsServerPort.getText());
+			controller.setClientTimeOut(jtfClientTimeOut.getText());
+			controller.setServerIP(jtfServerIP.getText());
+			controller.setServerPort(jtfServerPort.getText());
 			
-			// Tentative de sauvegarde et affichage du succès ou de l'erreur
-			if(cc.saveSettings()){
+			// Try to save settings and display a dialog if success or if error
+			if(controller.saveSettings()){
 				dispose();
 				frame.showErrorDialog("Saved", "Settings saved successfully", JOptionPane.INFORMATION_MESSAGE);
 			}
