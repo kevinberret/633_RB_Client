@@ -379,6 +379,8 @@ public class ClientWindow extends JFrame{
 		public void actionPerformed(ActionEvent e) {
 			if(!controller.getFiles(clientAsServerIP, jlFiles.getSelectedValuesList()))
 				showErrorDialog("Error", "Error while connecting to the server...", JOptionPane.ERROR_MESSAGE);
+			else
+				showErrorDialog("Success", "Download complete!", JOptionPane.INFORMATION_MESSAGE);
 		}		
 	}
 	
