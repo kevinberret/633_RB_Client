@@ -10,6 +10,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 /**
  * This class allow the client to receive files from another client
  * @author Daniel et Kevin
@@ -115,6 +117,9 @@ public class ClientReceiver implements Runnable{
 			}
 		    // close objects
 			dis.close();
+			
+			// display success message
+			JOptionPane.showMessageDialog(null, "Download complete!", "Success", JOptionPane.INFORMATION_MESSAGE);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
