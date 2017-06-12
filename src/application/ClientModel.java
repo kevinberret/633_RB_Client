@@ -40,11 +40,6 @@ public class ClientModel extends Observable{
 	private String defaultServerIP = new String("192.168.108.10");
 	
 	/**
-	 * client's ip address
-	 */
-	private String clientIp;
-	
-	/**
 	 * server's port
 	 */
 	private int serverPort;
@@ -82,7 +77,7 @@ public class ClientModel extends Observable{
 	/**
 	 * socket for connection with server
 	 */
-	private Socket mySocket;
+	private Socket clientSocket;
 	
 	/**
 	 * used to send objects through socket
@@ -137,23 +132,6 @@ public class ClientModel extends Observable{
 	}
 	
 	/**
-	 * get client's ip address
-	 * @return client's ip address
-	 */
-	public String getClientIP() {
-		return clientIp;
-	}	
-	
-	/**
-	 * get client's uuid
-	 * @return client's uuid
-	 */
-	public String getUuid() {
-		return uuid;
-	}
-
-	
-	/**
 	 * get port used by client when sends files
 	 * @return port used by client when sends files
 	 */
@@ -161,58 +139,101 @@ public class ClientModel extends Observable{
 		return clientAsServerPort;
 	}
 
+	/**
+	 * get clients list
+	 * @return clients list
+	 */
 	public LinkedHashMap<String, Client> getClientsList() {
 		return getClientFiles();
 	}
 	
+	/**
+	 * get shared folder
+	 * @return shared folder
+	 */
 	public String getFolder() {
 		return folder;
 	}
 	
+	/**
+	 * get server's ip address
+	 * @return server's ip address
+	 */
 	public String getServerIP() {
 		return serverIP;
 	}
 	
+	/**
+	 * get server's port
+	 * @return server's port
+	 */
 	public int getServerPort() {
 		return serverPort;
 	}
 	
+	/**
+	 * get client's timeout
+	 * @return client's timeout
+	 */
 	public int getClientTimeOut() {
 		return clientTimeOut;
 	}
 	
+	/**
+	 * get socket with server
+	 * @return socket with server
+	 */
 	public Socket getMySocket() {
-		return mySocket;
+		return clientSocket;
 	}
 	
+	/**
+	 * get the client representation of this client
+	 * @return the client representation of this client
+	 */
 	public Client getThisClient() {
 		return thisClient;
-	}
-	
-	/*
-	 * SETTERS
-	 */
+	}	
 
+	/**
+	 * set client's ip address
+	 * @param ip client's ip address
+	 */
 	public void setClientIP(String ip) {
-		clientIp = ip;
 		thisClient.setClientIp(ip);
 	}	
 
-	public void setServerIP(String serverName) {
-		properties.setProperty("server.ip", serverName);
-		this.serverIP = serverName;
+	/**
+	 * set server's ip address
+	 * @param serverIp server's ip address
+	 */
+	public void setServerIP(String serverIp) {
+		properties.setProperty("server.ip", serverIp);
+		this.serverIP = serverIp;
 	}	
 
+	/**
+	 * set port for socket connection with server
+	 * @param serverPort port for socket connection with server
+	 */
 	public void setServerPort(int serverPort) {
 		properties.setProperty("server.port", Integer.toString(serverPort));
 		this.serverPort = serverPort;
 	}	
 
+	/**
+	 * set client timeout
+	 * @param clientTimeOut client timeout in ms
+	 */
 	public void setClientTimeOut(int clientTimeOut) {
 		properties.setProperty("client.timeout", Integer.toString(clientTimeOut));
 		this.clientTimeOut = clientTimeOut;
 	}
 
+	/**
+	 * set port to be used when client has to send files
+	 * @param clientAsServerPort port to be used when client has to send files
+	 */
 	public void setClientAsServerPort(int clientAsServerPort) {
 		properties.setProperty("client.asserver.port", Integer.toString(clientAsServerPort));		
 		this.clientAsServerPort = clientAsServerPort;
@@ -305,8 +326,8 @@ public class ClientModel extends Observable{
 			serverAddress = InetAddress.getByName(serverIP);
 
 			// Try to connect to server
-			mySocket = new Socket();
-			mySocket.connect(new InetSocketAddress(serverAddress, serverPort), clientTimeOut);
+			clientSocket = new Socket();
+			clientSocket.connect(new InetSocketAddress(serverAddress, serverPort), clientTimeOut);
 			
 			// set client files list
 			filesList = new ArrayList<String>();
@@ -317,10 +338,10 @@ public class ClientModel extends Observable{
 			thisClient.setFiles(filesList);
 			
 			// set client's ip
-			thisClient.setClientIp(mySocket.getLocalAddress().toString().substring(1));
+			thisClient.setClientIp(clientSocket.getLocalAddress().toString().substring(1));
 			
 			// Objectoutputstream to send data through socket
-			objectOutput = new ObjectOutputStream(mySocket.getOutputStream());
+			objectOutput = new ObjectOutputStream(clientSocket.getOutputStream());
 			
 			// tell the server we want to register
 			objectOutput.writeObject(new String("registration"));
@@ -353,7 +374,7 @@ public class ClientModel extends Observable{
 			objectOutput.flush();
 			
 			// get the linkedhashmap from server
-			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
+			ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
 			return (LinkedHashMap<String, Client>) objectInputStream.readObject();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -380,7 +401,7 @@ public class ClientModel extends Observable{
 			objectOutput.flush();
 			
 			// get the client
-			ObjectInputStream objectInputStream = new ObjectInputStream(mySocket.getInputStream());
+			ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
 			return (Client) objectInputStream.readObject();
 		} catch (IOException e) {
 			e.printStackTrace();

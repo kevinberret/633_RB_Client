@@ -40,7 +40,7 @@ public class ClientController {
 	 * @return Client's ip address as String
 	 */
 	public String getClientIP() {
-		return model.getClientIP();
+		return model.getThisClient().getClientIp();
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class ClientController {
 		LinkedHashMap<String, Client> clients = model.getClientsList();
 		
 		// remove us from list
-		clients.remove(model.getUuid());
+		clients.remove(model.getThisClient().getUuid());
 		
 		// return all clients except us
 		return clients;
@@ -185,8 +185,11 @@ public class ClientController {
 			threadReceiver.start();
 			return true;
 		} catch (IOException e) {
-			return false;
+			e.printStackTrace();
 		}
+		
+		// Errors
+		return false;
 	}
 
 	/**
