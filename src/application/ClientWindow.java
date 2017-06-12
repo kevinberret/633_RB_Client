@@ -11,10 +11,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Vector;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,7 +27,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -105,16 +102,6 @@ public class ClientWindow extends JFrame{
 	private DefaultListModel<String> filesModel;
 	
 	/**
-	 * Combobox with network interfaces
-	 */
-	private JComboBox<String> jcbNetworkInterfaces;
-	
-	/**
-	 * Validation of network interface
-	 */
-	private JButton btnValidate;
-	
-	/**
 	 * Progressbar when download files
 	 */
 	private ClientProgressBar jpbCurrentProgress;
@@ -175,7 +162,6 @@ public class ClientWindow extends JFrame{
 		jmiShareFiles = new JMenuItem("Share", KeyEvent.VK_O);
 		jmiShareFiles.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		jmiShareFiles.addActionListener(new ShareFilesAction());
-		jmiShareFiles.setEnabled(false);
 		jmiGetClients = new JMenuItem("Get clients", KeyEvent.VK_G);
 		jmiGetClients.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, ActionEvent.CTRL_MASK));
 		jmiGetClients.addActionListener(new GetClientAction());
@@ -189,25 +175,7 @@ public class ClientWindow extends JFrame{
 		jmEdit.add(jmiSettings);		
 		jmbMenuBar.add(jmFile);
 		jmbMenuBar.add(jmEdit);
-		setJMenuBar(jmbMenuBar);		
-		
-		// ip address selection panel
-		JPanel pnlTop = new JPanel(new BorderLayout());
-		pnlTop.setBorder(new EmptyBorder(10, 10, 10, 10));
-		JLabel lblIPAddress = new JLabel("Select your network interface...");		
-		jcbNetworkInterfaces = new JComboBox<String>();
-		btnValidate = new JButton("Validate");
-		btnValidate.addActionListener(new ChooseIPAction());
-		
-		// add alements to top panel
-		pnlTop.add(lblIPAddress, BorderLayout.WEST);
-		pnlTop.add(jcbNetworkInterfaces, BorderLayout.CENTER);
-		pnlTop.add(btnValidate, BorderLayout.EAST);
-		
-		// add all addresses to combobox
-		for (String netint : controller.getNetworkInterfaces()) {
-			jcbNetworkInterfaces.addItem(netint);
-		}
+		setJMenuBar(jmbMenuBar);
 		
 		// create progress bars
 		jpbCurrentProgress = new ClientProgressBar(model);
@@ -226,7 +194,6 @@ public class ClientWindow extends JFrame{
 		pnlBottom.setVisible(false);
 		
 		// add all panels to frame
-		add(pnlTop, BorderLayout.NORTH);
 		add(pnlBottom, BorderLayout.SOUTH);
 				
 		// add listener to closing window (to ask question do you really want to quit?)
@@ -322,24 +289,6 @@ public class ClientWindow extends JFrame{
 	            setDefaultCloseOperation(EXIT_ON_CLOSE);
 	        }
 	    }
-	}
-	
-	/**
-	 * This inner class allows to handle IP choice
-	 * @author Kevin
-	 *
-	 */
-	private class ChooseIPAction implements ActionListener{
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// Set chosen ip address
-			controller.setClientIp(jcbNetworkInterfaces.getSelectedItem().toString());
-			
-			// Modify gui
-			btnValidate.setEnabled(false);
-			jcbNetworkInterfaces.setEnabled(false);
-			jmiShareFiles.setEnabled(true);
-		}		
 	}
 
 	/**

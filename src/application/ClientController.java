@@ -2,7 +2,6 @@ package application;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -89,14 +88,6 @@ public class ClientController {
 		
 		// return all clients except us
 		return clients;
-	}
-	
-	/**
-	 * Get this client's network interfaces
-	 * @return An ArrayList of String of network interfaces
-	 */
-	public ArrayList<String> getNetworkInterfaces(){
-		return model.getNetworkInterfaces();
 	}
 	
 	/**

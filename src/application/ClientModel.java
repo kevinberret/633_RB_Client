@@ -9,13 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Properties;
@@ -109,11 +105,6 @@ public class ClientModel extends Observable{
 	private int defaultClientTimeOut = 5000;
 	
 	/**
-	 * network interfaces
-	 */
-	private ArrayList<String> networks;
-	
-	/**
 	 * settings
 	 */
 	private Properties properties;
@@ -140,9 +131,6 @@ public class ClientModel extends Observable{
 	public ClientModel() {
 		// Get application settings
 		getResources();		
-		
-		// Get all network interfaces
-		getNetworkInterfaces();
 		
 		// Create this client object
 		thisClient = new Client(uuid);
@@ -257,7 +245,7 @@ public class ClientModel extends Observable{
 		serverIP = properties.getProperty("server.ip", defaultServerIP);
 		serverPort = Integer.parseInt(properties.getProperty("server.port", String.valueOf(defaultServerPort)));
 		clientTimeOut = Integer.parseInt(properties.getProperty("client.timeout", String.valueOf(defaultClientTimeOut)));
-		clientAsServerPort = Integer.parseInt(properties.getProperty("client.asserver.port", String.valueOf(defaultClientAsServerPort)));
+		clientAsServerPort = Integer.parseInt(properties.getProperty("client.asserver.port", String.valueOf(defaultClientAsServerPort)));		
 		
 		// Get client's uuid
 		uuid = properties.getProperty("client.uuid");
@@ -294,33 +282,6 @@ public class ClientModel extends Observable{
 	}
 	
 	/**
-	 * Get all network interfaces to let the user choose his interface
-	 * @return an arraylist of string of all interfaces
-	 */
-	public ArrayList<String> getNetworkInterfaces(){
-		// source : https://docs.oracle.com/javase/tutorial/networking/nifs/listing.html
-		if(networks == null){
-			networks = new ArrayList<String>();
-			
-			try {
-				Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();			
-				for (NetworkInterface netint : Collections.list(nets)){
-		        	Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();	        	
-		            for (InetAddress inetAddress : Collections.list(inetAddresses)) {
-		            	if (!inetAddress.isLoopbackAddress() && inetAddress.isSiteLocalAddress()) {
-		    	        	networks.add(inetAddress.getHostAddress());
-		            	}
-		            }
-		        }
-			} catch (SocketException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return networks;
-	}
-	
-	/**
 	 * Set the selected folder
 	 * @param selectedFolder The chosen folder to set
 	 * @return true if contains files, false if not
@@ -354,6 +315,9 @@ public class ClientModel extends Observable{
 					filesList.add(file.getName());
 			}			
 			thisClient.setFiles(filesList);
+			
+			// set client's ip
+			thisClient.setClientIp(mySocket.getLocalAddress().toString());
 			
 			// Objectoutputstream to send data through socket
 			objectOutput = new ObjectOutputStream(mySocket.getOutputStream());
@@ -432,15 +396,17 @@ public class ClientModel extends Observable{
 	 * This method allows to disconnect from server
 	 */
 	public void disconnectFromServer(){
-		try {
-			// Tell the server we want to quit the connection
-			objectOutput.writeObject(new String("quit"));
-			objectOutput.flush();
-			
-			objectOutput.writeObject(uuid);
-			objectOutput.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(objectOutput != null){
+			try {
+				// Tell the server we want to quit the connection
+				objectOutput.writeObject(new String("quit"));
+				objectOutput.flush();
+				
+				objectOutput.writeObject(uuid);
+				objectOutput.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
