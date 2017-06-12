@@ -317,7 +317,7 @@ public class ClientModel extends Observable{
 			thisClient.setFiles(filesList);
 			
 			// set client's ip
-			thisClient.setClientIp(mySocket.getLocalAddress().toString());
+			thisClient.setClientIp(mySocket.getLocalAddress().toString().substring(1));
 			
 			// Objectoutputstream to send data through socket
 			objectOutput = new ObjectOutputStream(mySocket.getOutputStream());
