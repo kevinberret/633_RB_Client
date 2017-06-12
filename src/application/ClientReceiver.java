@@ -121,7 +121,8 @@ public class ClientReceiver implements Runnable{
 			// display success message
 			JOptionPane.showMessageDialog(null, "Download complete!", "Success", JOptionPane.INFORMATION_MESSAGE);
 		} catch (IOException e) {
-			e.printStackTrace();
+			// display error message
+			JOptionPane.showMessageDialog(null, "Client was disconnected", "Error", JOptionPane.ERROR_MESSAGE);
 		}		
 	}
 }

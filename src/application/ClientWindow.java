@@ -313,7 +313,7 @@ public class ClientWindow extends JFrame{
 		    	if(controller.selectFolder(selectedFolder))
 		    		jmiGetClients.setEnabled(true);
 		    	else
-		    		showErrorDialog("Error", "Error while connecting to the server...", JOptionPane.ERROR_MESSAGE);		    	
+		    		showErrorDialog("Error", "Error while connecting to the server to share files...", JOptionPane.ERROR_MESSAGE);		    	
 		    }
 		}		
 	}
@@ -327,7 +327,7 @@ public class ClientWindow extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(!controller.getFiles(clientAsServerIP, jlFiles.getSelectedValuesList()))
-				showErrorDialog("Error", "Error while connecting to the server...", JOptionPane.ERROR_MESSAGE);
+				showErrorDialog("Error", "Error while connecting to the server to download files...", JOptionPane.ERROR_MESSAGE);
 		}		
 	}
 	

@@ -185,11 +185,8 @@ public class ClientController {
 			threadReceiver.start();
 			return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			return false;
 		}
-		
-		// Errors
-		return false;
 	}
 
 	/**
