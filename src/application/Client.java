@@ -106,8 +106,8 @@ public class Client implements Serializable {
 	}
 
 	/**
-	 * This methos allows to set the files shared by the client
-	 * @param files
+	 * This methods allows to set the files shared by the client
+	 * @param files the files shared by the client
 	 */
 	public void setFiles(ArrayList<String> files) {
 		this.files = files;
