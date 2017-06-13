@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
+
+import util.ClientLogger;
 
 /**
  * This class allow the client to receive files from another client
@@ -123,6 +126,8 @@ public class ClientReceiver implements Runnable{
 		} catch (IOException e) {
 			// display error message
 			JOptionPane.showMessageDialog(null, "Client was disconnected", "Error", JOptionPane.ERROR_MESSAGE);
+			
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}		
 	}
 }

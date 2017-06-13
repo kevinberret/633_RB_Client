@@ -11,6 +11,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Vector;
+import java.util.logging.Level;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -29,6 +31,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import util.ClientLogger;
 
 /**
  * This class is the main view of our application.
@@ -143,13 +147,13 @@ public class ClientWindow extends JFrame{
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.WARNING, e.getMessage(),e);
 		} catch (InstantiationException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.WARNING, e.getMessage(),e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.WARNING, e.getMessage(),e);
 		} catch (UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.WARNING, e.getMessage(),e);
 		}
 		
 		// set properties
@@ -284,6 +288,9 @@ public class ClientWindow extends JFrame{
 	        if (JOptionPane.showConfirmDialog(frame, "Are you sure you want to close this window?", "Close the window", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 	        	// close sockets
 	            controller.closeConnections();
+	            
+	            // close logging
+	            ClientLogger.closeFileHandler();
 	        	
 	            // terminate application
 	            setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -343,39 +350,43 @@ public class ClientWindow extends JFrame{
 			// Get all clients
 			clientsList = controller.getClientsList();
 			
-			// Creates the list or modify it
-			if(jlClients != null){
-				clientsListModel.clear();
-				filesModel.clear();
-				jlClients.clearSelection();
-				jlFiles.clearSelection();
-			}else{
-				clientsListModel = new Vector<Element>();
-				jlClients = new JList(clientsListModel);
+			if(clientsList == null)
+				showErrorDialog("Error", "Error when tried to contact server!", JOptionPane.ERROR_MESSAGE);
+			else{
+				// Creates the list or modify it
+				if(jlClients != null){
+					clientsListModel.clear();
+					filesModel.clear();
+					jlClients.clearSelection();
+					jlFiles.clearSelection();
+				}else{
+					clientsListModel = new Vector<Element>();
+					jlClients = new JList(clientsListModel);
+					
+					jlClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+					jlClients.setLayoutOrientation(JList.VERTICAL);
+					jlClients.setVisibleRowCount(-1);
+					jlClients.addListSelectionListener(new SelectClient());
+					
+					listClientsScroller = new JScrollPane(jlClients);
+					listClientsScroller.setPreferredSize(new Dimension(250, 80));
+					
+					add(listClientsScroller, BorderLayout.WEST);
+				}
 				
-				jlClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-				jlClients.setLayoutOrientation(JList.VERTICAL);
-				jlClients.setVisibleRowCount(-1);
-				jlClients.addListSelectionListener(new SelectClient());
+				// Add clients to the model (all except us)
+				for (String key : clientsList.keySet())
+				{			    
+				    Client tmpClient = clientsList.get(key);
+			    	clientsListModel.addElement(new Element(tmpClient.getUuid(), tmpClient.getClientIp()));			    
+				}
 				
-				listClientsScroller = new JScrollPane(jlClients);
-				listClientsScroller.setPreferredSize(new Dimension(250, 80));
+				revalidate();
 				
-				add(listClientsScroller, BorderLayout.WEST);
+				// make visible the panel to download files
+				if(!pnlBottom.isVisible())
+					pnlBottom.setVisible(true);
 			}
-			
-			// Add clients to the model (all except us)
-			for (String key : clientsList.keySet())
-			{			    
-			    Client tmpClient = clientsList.get(key);
-		    	clientsListModel.addElement(new Element(tmpClient.getUuid(), tmpClient.getClientIp()));			    
-			}
-			
-			revalidate();
-			
-			// make visible the panel to download files
-			if(!pnlBottom.isVisible())
-				pnlBottom.setVisible(true);
 		}	
 	}
 	

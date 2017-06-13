@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.logging.Level;
+
+import util.ClientLogger;
 
 /**
  * This class is the business part of the application. It communicates with the view and the model and execute checks and make actions according to
@@ -84,7 +87,8 @@ public class ClientController {
 		LinkedHashMap<String, Client> clients = model.getClientsList();
 		
 		// remove us from list
-		clients.remove(model.getThisClient().getUuid());
+		if(clients != null)
+			clients.remove(model.getThisClient().getUuid());
 		
 		// return all clients except us
 		return clients;
@@ -185,7 +189,7 @@ public class ClientController {
 			threadReceiver.start();
 			return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}
 		
 		// Errors
@@ -209,7 +213,7 @@ public class ClientController {
 				model.getMySocket().close();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}
 	}
 

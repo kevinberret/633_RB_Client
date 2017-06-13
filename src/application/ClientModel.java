@@ -16,6 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Level;
+
+import util.ClientLogger;
 
 /**
  * This class contains all data values
@@ -257,9 +260,9 @@ public class ClientModel extends Observable{
 			
 			fr.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}
 		
 		// Set application settings
@@ -295,7 +298,7 @@ public class ClientModel extends Observable{
 			fw.close();
 			return true;
 		} catch (IOException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}
 		
 		// errors
@@ -354,9 +357,9 @@ public class ClientModel extends Observable{
 			// connection established
 			return true;
 		}catch (UnknownHostException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}catch (IOException e) {
-			System.out.println("server connection error, dying.....");
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}
 
 		// error
@@ -377,9 +380,9 @@ public class ClientModel extends Observable{
 			ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
 			return (LinkedHashMap<String, Client>) objectInputStream.readObject();
 		} catch (IOException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}
 		
 		// errors
@@ -404,9 +407,9 @@ public class ClientModel extends Observable{
 			ObjectInputStream objectInputStream = new ObjectInputStream(clientSocket.getInputStream());
 			return (Client) objectInputStream.readObject();
 		} catch (IOException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}
 		
 		// error
@@ -426,7 +429,7 @@ public class ClientModel extends Observable{
 				objectOutput.writeObject(uuid);
 				objectOutput.flush();
 			} catch (IOException e) {
-				e.printStackTrace();
+				ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 			}
 		}
 	}

@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.logging.Level;
+
+import util.ClientLogger;
 
 /**
  * This class allows a client to send files to another client
@@ -83,9 +86,9 @@ public class ClientSender implements Runnable {
 			// Close objects
 			dos.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		}
 	}
 }

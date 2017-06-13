@@ -1,6 +1,9 @@
 package application;
 
 import java.net.ServerSocket;
+import java.util.logging.Level;
+
+import util.ClientLogger;
 
 /**
  * This class is used to listen to client and open connections with clients that want files that we share
@@ -55,7 +58,7 @@ public class ClientListener implements Runnable {
 				t.start();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			ClientLogger.getLogger().log(Level.SEVERE, e.getMessage(),e);
 		} 
 	}
 }
