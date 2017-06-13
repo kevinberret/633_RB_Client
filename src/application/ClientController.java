@@ -152,8 +152,8 @@ public class ClientController {
 	
 	/**
 	 * This method sets the folder as sharing folder and opens the connection with the server and then opens a thread that listens for other clients connections
-	 * @param selectedFolder
-	 * @return
+	 * @param selectedFolder The desired folder
+	 * @return true if folder is not empty and if connection to server was possible, false if not
 	 */
 	public boolean selectFolder(String selectedFolder){
 		// Check if folder exists and is not null

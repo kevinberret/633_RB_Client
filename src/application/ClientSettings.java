@@ -59,7 +59,7 @@ public class ClientSettings extends Dialog {
 	 * @param frame The main frame to which the dialog is related
 	 * @param title the title of the dialog or null if this dialog has no title
 	 * @param modal specifies whether dialog blocks user input to other top-level windows when shown. If false, the dialog is MODELESS; if true, the modality type property is set to DEFAULT_MODALITY_TYPE
-	 * @param controler
+	 * @param controler The client controller 
 	 */
 	public ClientSettings(JFrame frame, String title, boolean modal, ClientController controler) {
 		super(frame, title, modal);
